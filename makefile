@@ -16,7 +16,7 @@ EXECLFLAGS = -Wno-deprecated-gpu-targets
 $(LIBDIR)/NeuralNetwork/libneuralnetwork.so: $(OBJS)
 	$(CXX) $(LFLAGS) $(OBJS) -o $(LIBDIR)/NeuralNetwork/libneuralnetwork.so
 
-$(BUILDDIR)/NeuralNetwork.o: $(SRCDIR)/NeuralNetwork.cu $(INCLUDEDIR)/NeuralNetwork/NeuralNetwork.hpp $(INCLUDEDIR)/Math/Matrix.hpp
+$(BUILDDIR)/NeuralNetwork.o: $(INCLUDEDIR)/NeuralNetwork/NeuralNetwork.hpp $(INCLUDEDIR)/Math/Matrix.hpp $(SRCDIR)/NeuralNetwork.cu  $(SRCDIR)/NeuralNetworkCUDAFunctions.cu 
 	$(CXX) $(CFLAGS) $(SRCDIR)/NeuralNetwork.cu -o $(BUILDDIR)/NeuralNetwork.o
 
 $(TESTDIR)/NeuralNetworkTest: $(TESTOBJS) $(LIBDIR)/Math/libmath.so $(LIBDIR)/NeuralNetwork/libneuralnetwork.so

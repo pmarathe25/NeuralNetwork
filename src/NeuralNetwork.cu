@@ -2,6 +2,8 @@
 #include <math.h>
 #include <fstream>
 #include <iostream>
+// Include Neural Network functions.
+#include "NeuralNetworkCUDAFunctions.cu"
 
 namespace ai {
     template <typename T>
