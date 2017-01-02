@@ -4,7 +4,6 @@
 #include <iostream>
 
 namespace ai {
-
     template <typename T>
     NeuralNetwork<T>::NeuralNetwork(aFunc func, cFunc func2) {
         activationFunction = func;
@@ -15,8 +14,8 @@ namespace ai {
     NeuralNetwork<T>::NeuralNetwork(std::vector<int> layers, aFunc func, cFunc func2) : NeuralNetwork(func, func2) {
         // Initialize weights and biases.
         for (int i = 0; i < layers.size() - 1; ++i) {
-            weights.push_back(math::Matrix<T>(layers.at(i), layers.at(i + 1)));
-            biases.push_back(math::Matrix<T>(1, layers.at(i + 1)));
+            weights.push_back(math::Matrix<T>(layers[i], layers[i + 1]));
+            biases.push_back(math::Matrix<T>(1, layers[i + 1]));
         }
         // Initialize output layer cache.
         output = math::Matrix<T>(1, layers.back());
@@ -34,11 +33,14 @@ namespace ai {
     template <typename T>
     const math::Matrix<T>& NeuralNetwork<T>::getLayerOutput(const math::Matrix<T>& input, int layerNum) {
         output = input;
+        if (layerNum > weights.size()) {
+            throw std::invalid_argument("Layer does not exist.");
+        }
         for (int i = 0; i < layerNum; ++i) {
-            output = output * weights.at(i) + biases.at(i);
+            output = output * weights[i] + biases[i];
             applyActivationFunction(output);
             // Debug.
-            std::cout << "Layer " << i << std::endl;
+            // std::cout << "Layer " << i << std::endl;
             // std::cout << "========Weights========" << std::endl;
             // math::display(weights.at(i));
             // std::cout << "\n========Biases========" << std::endl;
@@ -56,8 +58,8 @@ namespace ai {
         if (saveFile.is_open()) {
             saveFile << weights.size() << std::endl;
             for (int i = 0; i < weights.size(); ++i) {
-                weights.at(i).write(saveFile);
-                biases.at(i).write(saveFile);
+                weights[i].write(saveFile);
+                biases[i].write(saveFile);
             }
             saveFile.close();
         } else {
@@ -75,10 +77,10 @@ namespace ai {
             weights = std::vector<math::Matrix<T> > (numWeights);
             biases = std::vector<math::Matrix<T> > (numWeights);
             for (int i = 0; i < weights.size() && !saveFile.eof(); ++i) {
-                weights.at(i).read(saveFile);
-                biases.at(i).read(saveFile);
+                weights[i].read(saveFile);
+                biases[i].read(saveFile);
             }
-            inputSize = weights.at(0).numRows();
+            inputSize = weights[0].numRows();
             saveFile.close();
         } else {
             throw std::invalid_argument("Could not open file.");
@@ -99,16 +101,8 @@ namespace ai {
     void NeuralNetwork<T>::initializeWeights() {
         double weightRange = 1 / sqrt(inputSize);
         for (int i = 0; i < weights.size(); ++i) {
-            weights.at(i).randomizeUniform(-weightRange, weightRange);
-            biases.at(i).randomizeNormal();
-        }
-    }
-
-    template <typename T>
-    __global__ void activationFunctionSigmoid(T* mat, int size) {
-        int index = blockIdx.x * blockDim.x + threadIdx.x;
-        if (index < size) {
-            mat[index] = 1 / (1 + exp(-mat[index]));
+            weights[i].randomizeUniform(-weightRange, weightRange);
+            biases[i].randomizeNormal();
         }
     }
 
@@ -126,7 +120,11 @@ namespace ai {
         dim3 threads(THREADS_PER_BLOCK);
         switch (activationFunction) {
             case SIGMOID:
-                activationFunctionSigmoid<<<blocks, threads>>>(dev_mat, layer.size());;
+                if (layer.isVector()) {
+                    activationFunctionVectorSigmoid<<<blocks, threads>>>(dev_mat, layer.size());;
+                } else {
+                    activationFunctionSigmoid<<<blocks, threads>>>(dev_mat);;
+                }
                 break;
         }
         // // Get result.
@@ -141,7 +139,7 @@ namespace ai {
         switch (costFunction) {
             case MSE:
                 error = expectedOutput - output;
-                error = (error * error) * (1 / (2.0 * inputSize));
+                error = error.dot(error) * (1 / (2.0 * inputSize));
                 break;
         }
         return error;

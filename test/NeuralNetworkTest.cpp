@@ -7,7 +7,9 @@ int main() {
     math::display(input);
     ai::NeuralNetwork<float> net = ai::NeuralNetwork<float>({3, 4000, 4000, 15});
     std::cout << "Created network." << std::endl;
-    math::display(net.feedForward(input));
+    for (int i = 0; i < 100; ++i) {
+        math::display(net.feedForward(input));
+    }
     std::cout << "Saving weights..." << std::endl;
     net.saveWeights("test/weights");
     std::cout << "Weights saved." << std::endl;

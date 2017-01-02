@@ -6,6 +6,7 @@
 
 const int BLOCK_DIM = 32;
 const int THREADS_PER_BLOCK = 1024;
+const int CPU_SATURATION_LIMIT = 16384;
 
 namespace math {
     template <typename T>
@@ -18,6 +19,7 @@ namespace math {
             enum opMode {
                 SUM = 0,
                 DIFFERENCE,
+                SCALAR_PRODUCT,
             };
             // Constructors.
             void init(int rows, int cols);
@@ -39,6 +41,9 @@ namespace math {
             const T& at(int row, int col) const;
             T& at(int index);
             const T& at(int index) const;
+            // Unsafe indexing functions.
+            T& operator[](int index);
+            const T& operator[](int index) const;
             // Raw data functions.
             T* data();
             const T* data() const;
@@ -67,12 +72,18 @@ namespace math {
             Matrix operator*(T other) const;
             Matrix operator+(const Matrix& other) const;
             Matrix operator-(const Matrix& other) const;
+            Matrix dot(const Matrix& other) const;
         private:
             std::vector<T> elements;
             int rowsRaw, colsRaw, rows, cols;
             bool isVec = false;
             // Internal functions.
-            Matrix arithmetic(const Matrix<T>& other, opMode mode) const;
+            Matrix CPUSum(const Matrix& other) const;
+            Matrix CPUDifference(const Matrix& other) const;
+            Matrix CPUScalarProduct(T other) const;
+            Matrix CPUDotProduct(const Matrix& other) const;
+            Matrix matrxArithmetic(const Matrix<T>& other, opMode mode) const;
+            Matrix scalarArithmetic(T other, opMode mode) const;
     };
 
     template <typename T>
