@@ -28,16 +28,16 @@ namespace ai {
     }
 
     template <typename T>
-    const math::Matrix<T>& NeuralNetwork<T>::feedForward(const math::Matrix<T>& input) {
+    const math::Matrix<T>& NeuralNetwork<T>::feedForward(const std::vector<T>& input) {
         return getLayerOutput(input, weights.size());
     }
 
     template <typename T>
-    const math::Matrix<T>& NeuralNetwork<T>::getLayerOutput(const math::Matrix<T>& input, int layerNum) {
+    const math::Matrix<T>& NeuralNetwork<T>::getLayerOutput(const std::vector<T>& input, int layerNum) {
         if (layerNum > weights.size()) {
             throw std::invalid_argument("Layer does not exist.");
         }
-        output = input;
+        output = math::Matrix<T>(input);
         for (int i = 0; i < layerNum; ++i) {
             output = output * weights[i] + biases[i];
             applyActivationFunction(output);
@@ -122,11 +122,7 @@ namespace ai {
         dim3 threads(THREADS_PER_BLOCK);
         switch (activationFunction) {
             case SIGMOID:
-                if (layer.isVector()) {
-                    activationFunctionVectorSigmoid<<<blocks, threads>>>(dev_mat, layer.size());;
-                } else {
-                    activationFunctionSigmoid<<<blocks, threads>>>(dev_mat);;
-                }
+                activationFunctionSigmoid<<<blocks, threads>>>(dev_mat, layer.size());
                 break;
         }
         // // Get result.

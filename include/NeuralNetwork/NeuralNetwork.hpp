@@ -16,8 +16,8 @@ namespace ai {
             NeuralNetwork(aFunc func = SIGMOID, cFunc func2 = MSE);
             NeuralNetwork(std::vector<int> layers, aFunc func = SIGMOID, cFunc func2 = MSE);
             // Usage methods.
-            const math::Matrix<T>& feedForward(const math::Matrix<T>& input);
-            const math::Matrix<T>& getLayerOutput(const math::Matrix<T>& input, int layerNum);
+            const math::Matrix<T>& feedForward(const std::vector<T>& input);
+            const math::Matrix<T>& getLayerOutput(const std::vector<T>& input, int layerNum);
             // File I/O.
             void saveWeights(const std::string& filePath);
             void loadWeights(const std::string& filePath);
