@@ -38,7 +38,6 @@ namespace ai {
             throw std::invalid_argument("Layer does not exist.");
         }
         output = input;
-        applyActivationFunction(output);
         for (int i = 0; i < layerNum; ++i) {
             output = output * weights[i] + biases[i];
             applyActivationFunction(output);
