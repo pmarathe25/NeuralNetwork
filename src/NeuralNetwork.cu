@@ -34,10 +34,11 @@ namespace ai {
 
     template <typename T>
     const math::Matrix<T>& NeuralNetwork<T>::getLayerOutput(const math::Matrix<T>& input, int layerNum) {
-        output = input;
         if (layerNum > weights.size()) {
             throw std::invalid_argument("Layer does not exist.");
         }
+        output = input;
+        applyActivationFunction(output);
         for (int i = 0; i < layerNum; ++i) {
             output = output * weights[i] + biases[i];
             applyActivationFunction(output);
@@ -101,7 +102,7 @@ namespace ai {
 
     template <typename T>
     void NeuralNetwork<T>::initializeWeights() {
-        double weightRange = 1 / sqrt(inputSize);
+        double weightRange = 2 / sqrt(inputSize);
         for (int i = 0; i < weights.size(); ++i) {
             weights[i].randomizeUniform(-weightRange, weightRange);
             biases[i].randomizeNormal();

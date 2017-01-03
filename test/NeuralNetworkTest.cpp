@@ -5,7 +5,7 @@
 int main() {
     math::Matrix<double> input = math::Matrix<double>({1, 2, 3}, 1, 3);
     math::display(input);
-    ai::NeuralNetwork<float> net = ai::NeuralNetwork<float>({3, 4000, 4000, 15});
+    ai::NeuralNetwork<double> net = ai::NeuralNetwork<double>({3, 4000, 4000, 15});
     std::cout << "Created network." << std::endl;
     for (int i = 0; i < 100; ++i) {
         math::display(net.feedForward(input));
