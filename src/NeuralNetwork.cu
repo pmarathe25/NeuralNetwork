@@ -4,6 +4,7 @@
 #include <iostream>
 // Include Neural Network functions.
 #include "NeuralNetworkCUDAFunctions.cu"
+#include "NeuralNetworkCPUFunctions.cpp"
 
 namespace ai {
     template <typename T>
@@ -109,8 +110,15 @@ namespace ai {
     }
 
     template <typename T>
-    void NeuralNetwork<T>::applyActivationFunction(math::Matrix<T>& layer) {
-        int rawSize = layer.sizeRaw();
+    void NeuralNetwork<T>::applyActivationFunction(math::Matrix<T>& layer) const {
+        if (layer.size() < CPU_SATURATION_LIMIT) {
+            switch (activationFunction) {
+                case SIGMOID:
+                    applyActivationFunctionCPU(layer);
+                    return;
+            }
+        }
+        int rawSize = layer.size();
         // Initialize device copies.
         T* dev_mat;
         // // Allocate memory for device copies.

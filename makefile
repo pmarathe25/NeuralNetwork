@@ -16,13 +16,15 @@ EXECLFLAGS = -Wno-deprecated-gpu-targets
 $(LIBDIR)/NeuralNetwork/libneuralnetwork.so: $(OBJS)
 	$(CXX) $(LFLAGS) $(OBJS) -o $(LIBDIR)/NeuralNetwork/libneuralnetwork.so
 
-$(BUILDDIR)/NeuralNetwork.o: $(INCLUDEDIR)/NeuralNetwork/NeuralNetwork.hpp $(INCLUDEDIR)/Math/Matrix.hpp $(SRCDIR)/NeuralNetwork.cu  $(SRCDIR)/NeuralNetworkCUDAFunctions.cu 
+$(BUILDDIR)/NeuralNetwork.o: $(INCLUDEDIR)/NeuralNetwork/NeuralNetwork.hpp $(INCLUDEDIR)/Math/Matrix.hpp $(SRCDIR)/NeuralNetwork.cu \
+	$(SRCDIR)/NeuralNetworkCUDAFunctions.cu $(SRCDIR)/NeuralNetworkCPUFunctions.cpp
 	$(CXX) $(CFLAGS) $(SRCDIR)/NeuralNetwork.cu -o $(BUILDDIR)/NeuralNetwork.o
 
 $(TESTDIR)/NeuralNetworkTest: $(TESTOBJS) $(LIBDIR)/Math/libmath.so $(LIBDIR)/NeuralNetwork/libneuralnetwork.so
 	$(CXX) $(TESTLFLAGS) $(TESTOBJS) $(LIBDIR)/Math/libmath.so $(LIBDIR)/NeuralNetwork/libneuralnetwork.so -o $(TESTDIR)/NeuralNetworkTest
 
-$(BUILDDIR)/NeuralNetworkTest.o: $(TESTDIR)/NeuralNetworkTest.cpp $(INCLUDEDIR)/NeuralNetwork/NeuralNetwork.hpp $(LIBDIR)/Math/libmath.so $(LIBDIR)/NeuralNetwork/libneuralnetwork.so
+$(BUILDDIR)/NeuralNetworkTest.o: $(TESTDIR)/NeuralNetworkTest.cpp $(INCLUDEDIR)/NeuralNetwork/NeuralNetwork.hpp \
+	$(LIBDIR)/Math/libmath.so $(LIBDIR)/NeuralNetwork/libneuralnetwork.so
 	$(CXX) $(CFLAGS) $(TESTDIR)/NeuralNetworkTest.cpp -o $(BUILDDIR)/NeuralNetworkTest.o
 
 clean:

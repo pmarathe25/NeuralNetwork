@@ -36,8 +36,10 @@ namespace ai {
             // Initialization.
             void initializeWeights();
             // Helper functions.
-            void applyActivationFunction(math::Matrix<T>& layer);
+            void applyActivationFunction(math::Matrix<T>& layer) const;
             math::Matrix<T> cost(const math::Matrix<T>& output, const math::Matrix<T>& expectedOutput);
+
+            void applyActivationFunctionCPU(math::Matrix<T>& layer) const;
     };
 }
 

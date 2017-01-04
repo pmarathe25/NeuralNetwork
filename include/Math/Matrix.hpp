@@ -12,10 +12,6 @@ namespace math {
     template <typename T>
     class Matrix {
         public:
-            enum randMode {
-                UNIFORM = 0,
-                NORMAL,
-            };
             enum opMode {
                 SUM = 0,
                 DIFFERENCE,
@@ -49,11 +45,6 @@ namespace math {
             const T* data() const;
             std::vector<T>& raw();
             const std::vector<T>& raw() const;
-            std::vector<T> getElements() const;
-            // Getter functions for the underlying data.
-            int numRowsRaw() const;
-            int numColumnsRaw() const;
-            int sizeRaw() const;
             // User-facing getter functions.
             int numRows() const;
             int numColumns() const;
@@ -68,17 +59,19 @@ namespace math {
             void randomizeNormal(T mean = 0, T stdDev = 1);
             void randomizeUniform(T lowerBound = 0, T upperBound = 1);
             Matrix& transpose();
+            Matrix dot(const Matrix& other) const;
             Matrix operator*(const Matrix& other) const;
             Matrix operator*(T other) const;
             Matrix operator+(const Matrix& other) const;
             Matrix operator-(const Matrix& other) const;
-            Matrix dot(const Matrix& other) const;
         private:
             std::vector<T> elements;
-            int rowsRaw, colsRaw, rows, cols;
+            int rowsRaw, colsRaw, rows, cols, matrixSize;
             bool isVec = false;
             // Internal functions.
             Matrix CPUSum(const Matrix& other) const;
+            Matrix CPUMatrixVectorSum(const Matrix& other) const;
+            Matrix CPUMatrixVectorDifference(const Matrix& other) const;
             Matrix CPUDifference(const Matrix& other) const;
             Matrix CPUScalarProduct(T other) const;
             Matrix CPUDotProduct(const Matrix& other) const;
@@ -101,7 +94,7 @@ namespace math {
 
     template <typename T>
     bool operator==(const Matrix<T>& A, const Matrix<T>& B) {
-        return (A.numRows() == B.numRows() && A.numColumns() == B.numColumns() && A.getElements() == B.getElements());
+        return (A.numRows() == B.numRows() && A.numColumns() == B.numColumns() && A.raw() == B.raw());
     }
 
     template <typename T, typename O>
