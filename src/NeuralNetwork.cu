@@ -19,9 +19,10 @@ namespace ai {
         for (int i = 0; i < layers.size() - 1; ++i) {
             weights.push_back(math::Matrix<T>(layers[i], layers[i + 1]));
             biases.push_back(math::Matrix<T>(1, layers[i + 1]));
+            // Initialize output cache.
+            outputs.push_back(math::Matrix<T>(1, layers[i + 1]));
+            activationOutputs.push_back(math::Matrix<T>(1, layers[i + 1]));
         }
-        // Initialize output layer cache.
-        output = math::Matrix<T>(1, layers.back());
         // Keep track of input size.
         inputSize = layers.front();
         // Randomize weights and biases.
@@ -29,19 +30,25 @@ namespace ai {
     }
 
     template <typename T>
-    const math::Matrix<T>& NeuralNetwork<T>::feedForward(const std::vector<T>& input) {
+    const math::Matrix<T>& NeuralNetwork<T>::feedForward(const math::Matrix<T>& input) {
         return getLayerOutput(input, weights.size());
     }
 
     template <typename T>
-    const math::Matrix<T>& NeuralNetwork<T>::getLayerOutput(const std::vector<T>& input, int layerNum) {
+    const math::Matrix<T>& NeuralNetwork<T>::getLayerOutput(const math::Matrix<T>& input, int layerNum) {
         if (layerNum > weights.size()) {
             throw std::invalid_argument("Layer does not exist.");
         }
-        output = math::Matrix<T>(input);
+        outputs[0] = input;
         for (int i = 0; i < layerNum; ++i) {
-            output = output * weights[i] + biases[i];
-            applyActivationFunction(output);
+            outputs[i] = outputs[i] * weights[i] + biases[i];
+            // Save this output as input to the next layer.
+            activationOutputs[i] = outputs[i];
+            applyActivationFunction(activationOutputs[i]);
+            if (i + 1 < layerNum) {
+                outputs[i + 1] = activationOutputs[i];
+            }
+            // Save the activated output.
             // Debug.
             // std::cout << "Layer " << i << std::endl;
             // std::cout << "========Weights========" << std::endl;
@@ -52,7 +59,7 @@ namespace ai {
             // math::display(output);
             // std::cout << std::endl;
         }
-        return output;
+        return activationOutputs.back();
     }
 
     template <typename T>
@@ -79,6 +86,8 @@ namespace ai {
             int numWeights = std::stoi(temp);
             weights = std::vector<math::Matrix<T> > (numWeights);
             biases = std::vector<math::Matrix<T> > (numWeights);
+            outputs = std::vector<math::Matrix<T> > (numWeights);
+            activationOutputs = std::vector<math::Matrix<T> > (numWeights);
             for (int i = 0; i < weights.size() && !saveFile.eof(); ++i) {
                 weights[i].read(saveFile);
                 biases[i].read(saveFile);
@@ -114,7 +123,7 @@ namespace ai {
         if (layer.size() < CPU_SATURATION_LIMIT) {
             switch (activationFunction) {
                 case SIGMOID:
-                    applyActivationFunctionCPU(layer);
+                    applySigmoidCPU(layer);
                     return;
             }
         }

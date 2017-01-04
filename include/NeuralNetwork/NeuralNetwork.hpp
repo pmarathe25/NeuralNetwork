@@ -16,8 +16,8 @@ namespace ai {
             NeuralNetwork(aFunc func = SIGMOID, cFunc func2 = MSE);
             NeuralNetwork(std::vector<int> layers, aFunc func = SIGMOID, cFunc func2 = MSE);
             // Usage methods.
-            const math::Matrix<T>& feedForward(const std::vector<T>& input);
-            const math::Matrix<T>& getLayerOutput(const std::vector<T>& input, int layerNum);
+            const math::Matrix<T>& feedForward(const math::Matrix<T>& input);
+            const math::Matrix<T>& getLayerOutput(const math::Matrix<T>& input, int layerNum);
             // File I/O.
             void saveWeights(const std::string& filePath);
             void loadWeights(const std::string& filePath);
@@ -27,8 +27,9 @@ namespace ai {
         private:
             std::vector<math::Matrix<T> > weights;
             std::vector<math::Matrix<T> > biases;
-            // Cache previous output.
-            math::Matrix<T> output;
+            // Cache previous outputs.
+            std::vector<math::Matrix<T> > outputs;
+            std::vector<math::Matrix<T> > activationOutputs;
             // Other data members.
             aFunc activationFunction;
             cFunc costFunction;
@@ -39,7 +40,7 @@ namespace ai {
             void applyActivationFunction(math::Matrix<T>& layer) const;
             math::Matrix<T> cost(const math::Matrix<T>& output, const math::Matrix<T>& expectedOutput);
 
-            void applyActivationFunctionCPU(math::Matrix<T>& layer) const;
+            void applySigmoidCPU(math::Matrix<T>& layer) const;
     };
 }
 
