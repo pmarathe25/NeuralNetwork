@@ -25,8 +25,8 @@ namespace ai {
             // Getter functions.
             int getNumLayers() const;
             // Setter functions.
-            void setActivationFunction(aFunc func);
-            void setCostFunction(cFunc func);
+            afunc& activationFunction();
+            cFunc& costFunction();
         private:
             std::vector<math::Matrix<T> > weights;
             std::vector<math::Matrix<T> > biases;
@@ -36,8 +36,8 @@ namespace ai {
             // Error for each layer.
             std::vector<math::Matrix<T> > deltas;
             // Other data members.
-            aFunc activationFunction;
-            cFunc costFunction;
+            aFunc actFunc;
+            cFunc costFunc;
             int inputSize, numLayers;
             // Initialization.
             void initializeWeights();

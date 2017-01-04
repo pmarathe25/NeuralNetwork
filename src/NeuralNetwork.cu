@@ -154,13 +154,13 @@ namespace ai {
     }
 
     template <typename T>
-    void NeuralNetwork<T>::setActivationFunction(aFunc func) {
-        activationFunction = func;
+    void NeuralNetwork<T>::activationFunction() {
+        return actFunc;
     }
 
     template <typename T>
-    void NeuralNetwork<T>::setCostFunction(cFunc func) {
-        costFunction = func;
+    void NeuralNetwork<T>::costFunction() {
+        return costFunc;
     }
 
     template <typename T>
@@ -176,7 +176,7 @@ namespace ai {
     math::Matrix<T> NeuralNetwork<T>::applyActivationFunction(const math::Matrix<T>& layer) const {
         math::Matrix<T> out = math::Matrix<T>(layer.numRows(), layer.numColumns());
         if (layer.size() < CPU_SATURATION_LIMIT) {
-            switch (activationFunction) {
+            switch (activationFunction()) {
                 case SIGMOID:
                     out = applySigmoidCPU(layer);
                     return out;
@@ -208,7 +208,7 @@ namespace ai {
     template <typename T>
     math::Matrix<T> NeuralNetwork<T>::applyActivationFunctionDerivative(const math::Matrix<T>& layer) const {
         math::Matrix<T> out = math::Matrix<T>(layer.numRows(), layer.numColumns());
-        switch (activationFunction) {
+        switch (activationFunction()) {
             case SIGMOID:
                 out = applyActivationFunction(layer);
                 out = out.hadamard(1 - out);
@@ -221,7 +221,7 @@ namespace ai {
     template <typename T>
     math::Matrix<T> NeuralNetwork<T>::cost(const math::Matrix<T>& output, const math::Matrix<T>& expectedOutput) {
         math::Matrix<T> error;
-        switch (costFunction) {
+        switch (costFunction()) {
             case MSE:
                 error = expectedOutput - output;
                 error = error.dot(error) * (1 / (2.0 * inputSize));
@@ -233,7 +233,7 @@ namespace ai {
     template <typename T>
     math::Matrix<T> NeuralNetwork<T>::costDerivative(const math::Matrix<T>& output, const math::Matrix<T>& expectedOutput) {
         math::Matrix<T> error;
-        switch (costFunction) {
+        switch (costFunction()) {
             case MSE:
                 error = output - expectedOutput;
                 break;
