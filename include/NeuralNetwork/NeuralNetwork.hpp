@@ -16,11 +16,14 @@ namespace ai {
             NeuralNetwork(aFunc func = SIGMOID, cFunc func2 = MSE);
             NeuralNetwork(std::vector<int> layers, aFunc func = SIGMOID, cFunc func2 = MSE);
             // Usage methods.
+            void train(const math::Matrix<T>& input, const math::Matrix<T>& desiredOutput, T learningRate);
             const math::Matrix<T>& feedForward(const math::Matrix<T>& input);
             const math::Matrix<T>& getLayerOutput(const math::Matrix<T>& input, int layerNum);
             // File I/O.
             void saveWeights(const std::string& filePath);
             void loadWeights(const std::string& filePath);
+            // Getter functions.
+            int getNumLayers() const;
             // Setter functions.
             void setActivationFunction(aFunc func);
             void setCostFunction(cFunc func);
@@ -30,17 +33,20 @@ namespace ai {
             // Cache previous outputs.
             std::vector<math::Matrix<T> > outputs;
             std::vector<math::Matrix<T> > activationOutputs;
+            // Error for each layer.
+            std::vector<math::Matrix<T> > deltas;
             // Other data members.
             aFunc activationFunction;
             cFunc costFunction;
-            int inputSize;
+            int inputSize, numLayers;
             // Initialization.
             void initializeWeights();
             // Helper functions.
-            void applyActivationFunction(math::Matrix<T>& layer) const;
+            math::Matrix<T> applyActivationFunction(const math::Matrix<T>& layer) const;
+            math::Matrix<T> applyActivationFunctionDerivative(const math::Matrix<T>& layer) const;
             math::Matrix<T> cost(const math::Matrix<T>& output, const math::Matrix<T>& expectedOutput);
-
-            void applySigmoidCPU(math::Matrix<T>& layer) const;
+            math::Matrix<T> costDerivative(const math::Matrix<T>& output, const math::Matrix<T>& expectedOutput);
+            math::Matrix<T> applySigmoidCPU(const math::Matrix<T>& layer) const ;
     };
 }
 

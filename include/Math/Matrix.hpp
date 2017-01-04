@@ -16,6 +16,7 @@ namespace math {
                 SUM = 0,
                 DIFFERENCE,
                 SCALAR_PRODUCT,
+                HADAMARD_PRODUCT,
             };
             // Constructors.
             void init(int rows, int cols);
@@ -58,23 +59,31 @@ namespace math {
             // Computation functions.
             void randomizeNormal(T mean = 0, T stdDev = 1);
             void randomizeUniform(T lowerBound = 0, T upperBound = 1);
-            Matrix& transpose();
+            Matrix transpose();
+            Matrix hadamard(const Matrix& other) const;
+            Matrix kronecker(const Matrix& other) const;
             Matrix dot(const Matrix& other) const;
             Matrix operator*(const Matrix& other) const;
             Matrix operator*(T other) const;
             Matrix operator+(const Matrix& other) const;
+            Matrix operator+(T other) const;
             Matrix operator-(const Matrix& other) const;
+            Matrix operator-(T other) const;
         private:
             std::vector<T> elements;
             int rowsRaw, colsRaw, rows, cols, matrixSize;
             bool isVec = false;
             // Internal functions.
             Matrix CPUSum(const Matrix& other) const;
+            Matrix CPUSum(T other) const;
             Matrix CPUMatrixVectorSum(const Matrix& other) const;
             Matrix CPUMatrixVectorDifference(const Matrix& other) const;
             Matrix CPUDifference(const Matrix& other) const;
+            Matrix CPUDifference(T other) const;
             Matrix CPUScalarProduct(T other) const;
             Matrix CPUDotProduct(const Matrix& other) const;
+            Matrix CPUHadamardProduct(const Matrix<T>& other) const;
+            Matrix CPUKroneckerProduct(const Matrix<T>& other) const;
             Matrix matrixArithmetic(const Matrix<T>& other, opMode mode) const;
             Matrix matrixTiledArithmetic(const Matrix<T>& other, opMode mode) const;
             Matrix scalarArithmetic(T other, opMode mode) const;
@@ -90,6 +99,11 @@ namespace math {
     template <typename T, typename O>
     Matrix<T> operator*(O other, const Matrix<T>& A) {
         return A * other;
+    }
+
+    template <typename T, typename O>
+    Matrix<T> operator-(O other, const Matrix<T>& A) {
+        return (A * -1) + other;
     }
 
     template <typename T>
