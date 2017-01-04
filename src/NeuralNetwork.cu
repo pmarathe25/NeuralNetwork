@@ -66,6 +66,7 @@ namespace ai {
             // std::cout << "========Weights========" << std::endl;
             // math::display(weights[i]);
             // std::cout << std::endl;
+            // TODO: Compute average activationOutputs[i] and deltas[i] by performig a row average.
             weightDeltas.push_back((activationOutputs[i].transpose()).kronecker(deltas[i]));
         }
         biasDeltas = deltas;
