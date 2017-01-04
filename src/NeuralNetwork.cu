@@ -37,18 +37,20 @@ namespace ai {
     template <typename T>
     void NeuralNetwork<T>::train(const math::Matrix<T>& input, const math::Matrix<T>& desiredOutput, T learningRate) {
         feedForward(input);
-        deltas.back() = costDerivative(activationOutputs.back(), desiredOutput).hadamard(applyActivationFunctionDerivative(outputs.back()));
+        deltas.back() = costDerivative(activationOutputs.back(), desiredOutput).hadamard(applyActivationFunctionDerivative(outputs.back())).rowMean();
         for (int i = numLayers - 3; i >= 0; --i) {
             // Debug
-            // std::cout << "Layer " << i + 1 << std::endl;
-            // std::cout << "========Weights Transpose========" << std::endl;
-            // math::display(weights[i + 1].transpose());
-            // std::cout << "\n========Deltas========" << std::endl;
-            // math::display(deltas[i + 1]);
-            // std::cout << "\n========Output After Activation Derivative========" << std::endl;
-            // math::display(applyActivationFunctionDerivative(outputs[i + 1]));
-            // std::cout << std::endl;
-            deltas[i] = (deltas[i + 1] * (weights[i + 1].transpose())).hadamard(applyActivationFunctionDerivative(outputs[i + 1]));
+            std::cout << "Layer " << i + 1 << std::endl;
+            std::cout << "========Weights========" << std::endl;
+            math::display(weights[i + 1]);
+            std::cout << "\n========Deltas========" << std::endl;
+            math::display(deltas[i + 1].transpose());
+            std::cout << "\n========Weights * (Deltas Transpose) Transpose========" << std::endl;
+            math::display((weights[i + 1] * deltas[i + 1].transpose()).transpose());
+            std::cout << "\n========Output After Activation Derivative========" << std::endl;
+            math::display(applyActivationFunctionDerivative(outputs[i + 1]));
+            std::cout << std::endl;
+            deltas[i] = ((weights[i + 1] * deltas[i + 1].transpose()).transpose()).hadamard(applyActivationFunctionDerivative(outputs[i + 1].rowMean()));
         }
         // Gradients for each layers.
         std::vector<math::Matrix<T> > weightDeltas;
@@ -67,12 +69,12 @@ namespace ai {
             // math::display(weights[i]);
             // std::cout << std::endl;
             // TODO: Compute average activationOutputs[i] and deltas[i] by performig a row average.
-            weightDeltas.push_back((activationOutputs[i].transpose()).kronecker(deltas[i]));
+            weightDeltas.push_back((activationOutputs[i].rowMean().transpose()).kronecker(deltas[i]));
         }
         biasDeltas = deltas;
         for (int i = 0; i < biases.size(); ++i) {
             weights[i] = weights[i] + (learningRate * weightDeltas[i]);
-            biases[i] = biases[i] + (learningRate * biasDeltas[i]);
+            biases[i] = biases[i] - (learningRate * biasDeltas[i]);
         }
     }
 
@@ -164,7 +166,7 @@ namespace ai {
     template <typename T>
     void NeuralNetwork<T>::initializeWeights() {
         double weightRange = 2 / sqrt(inputSize);
-        for (int i = 0; i < numLayers; ++i) {
+        for (int i = 0; i < numLayers - 1; ++i) {
             weights[i].randomizeUniform(-weightRange, weightRange);
             biases[i].randomizeNormal();
         }
