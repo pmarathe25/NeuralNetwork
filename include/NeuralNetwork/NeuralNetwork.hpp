@@ -25,8 +25,10 @@ namespace ai {
             // Getter functions.
             int getNumLayers() const;
             // Setter functions.
-            afunc& activationFunction();
+            aFunc& activationFunction();
             cFunc& costFunction();
+            const aFunc& activationFunction() const;
+            const cFunc& costFunction() const;
         private:
             std::vector<math::Matrix<T> > weights;
             std::vector<math::Matrix<T> > biases;

@@ -9,8 +9,8 @@
 namespace ai {
     template <typename T>
     NeuralNetwork<T>::NeuralNetwork(aFunc func, cFunc func2) {
-        activationFunction = func;
-        costFunction = func2;
+        actFunc = func;
+        costFunc = func2;
     }
 
     template <typename T>
@@ -37,20 +37,30 @@ namespace ai {
     template <typename T>
     void NeuralNetwork<T>::train(const math::Matrix<T>& input, const math::Matrix<T>& desiredOutput, T learningRate) {
         feedForward(input);
-        deltas.back() = costDerivative(activationOutputs.back(), desiredOutput).hadamard(applyActivationFunctionDerivative(outputs.back())).rowMean();
+        // Debug
+        // std::cout << "========Cost Derivative========" << std::endl;
+        // math::display(costDerivative(activationOutputs.back(), desiredOutput));
+        // std::cout << "\n========Activation========" << std::endl;
+        // math::display(activationOutputs.back());
+        // std::cout << "\n========Output before activation========" << std::endl;
+        // math::display(outputs.back());
+        // std::cout << "\n========Activation Derivative========" << std::endl;
+        // math::display(applyActivationFunctionDerivative(activationOutputs.back()));
+        // std::cout << std::endl;
+        deltas.back() = costDerivative(activationOutputs.back(), desiredOutput).hadamard(applyActivationFunctionDerivative(activationOutputs.back()));
         for (int i = numLayers - 3; i >= 0; --i) {
             // Debug
-            std::cout << "Layer " << i + 1 << std::endl;
-            std::cout << "========Weights========" << std::endl;
-            math::display(weights[i + 1]);
-            std::cout << "\n========Deltas========" << std::endl;
-            math::display(deltas[i + 1].transpose());
-            std::cout << "\n========Weights * (Deltas Transpose) Transpose========" << std::endl;
-            math::display((weights[i + 1] * deltas[i + 1].transpose()).transpose());
-            std::cout << "\n========Output After Activation Derivative========" << std::endl;
-            math::display(applyActivationFunctionDerivative(outputs[i + 1]));
-            std::cout << std::endl;
-            deltas[i] = ((weights[i + 1] * deltas[i + 1].transpose()).transpose()).hadamard(applyActivationFunctionDerivative(outputs[i + 1].rowMean()));
+            // std::cout << "Layer " << i + 1 << std::endl;
+            // std::cout << "========Weights========" << std::endl;
+            // math::display(weights[i + 1]);
+            // std::cout << "\n========Deltas========" << std::endl;
+            // math::display(deltas[i + 1].transpose());
+            // std::cout << "\n========Weights * (Deltas Transpose) Transpose========" << std::endl;
+            // math::display((weights[i + 1] * deltas[i + 1].transpose()).transpose());
+            // std::cout << "\n========Output After Activation Derivative========" << std::endl;
+            // math::display(applyActivationFunctionDerivative(activationOutputs[i + 1]));
+            // std::cout << std::endl;
+            deltas[i] = (deltas[i + 1] * weights[i + 1].transpose()).hadamard(applyActivationFunctionDerivative(activationOutputs[i]));
         }
         // Gradients for each layers.
         std::vector<math::Matrix<T> > weightDeltas;
@@ -69,12 +79,13 @@ namespace ai {
             // math::display(weights[i]);
             // std::cout << std::endl;
             // TODO: Compute average activationOutputs[i] and deltas[i] by performig a row average.
+            deltas[i] = deltas[i].rowMean();
             weightDeltas.push_back((activationOutputs[i].rowMean().transpose()).kronecker(deltas[i]));
+            biasDeltas.push_back(deltas[i]);
         }
-        biasDeltas = deltas;
-        for (int i = 0; i < biases.size(); ++i) {
+        for (int i = 0; i < weights.size(); ++i) {
             weights[i] = weights[i] + (learningRate * weightDeltas[i]);
-            biases[i] = biases[i] - (learningRate * biasDeltas[i]);
+            biases[i] = biases[i] + (learningRate * biasDeltas[i]);
         }
     }
 
@@ -85,27 +96,30 @@ namespace ai {
 
     template <typename T>
     const math::Matrix<T>& NeuralNetwork<T>::getLayerOutput(const math::Matrix<T>& input, int layerNum) {
-        if (layerNum > numLayers) {
-            throw std::invalid_argument("Layer does not exist.");
-        }
         outputs[0] = input;
-        activationOutputs[0] = applyActivationFunction(outputs[0]);
+        activationOutputs[0] = outputs[0];
         for (int i = 1; i < layerNum; ++i) {
             outputs[i] = activationOutputs[i - 1] * weights[i - 1] + biases[i - 1];
             // Save this output as input to the next layer.
             activationOutputs[i] = applyActivationFunction(outputs[i]);
+            // Debug
+            // std::cout << "Layer " << i - 1 << std::endl;
+            // std::cout << "========Input========" << std::endl;
+            // math::display(activationOutputs[i - 1]);
+            // std::cout << "========Weights========" << std::endl;
+            // math::display(weights[i - 1]);
+            // std::cout << "\n========Biases========" << std::endl;
+            // math::display(biases[i - 1]);
+            // std::cout << "\n========Output * Weight========" << std::endl;
+            // math::display(activationOutputs[i - 1] * weights[i - 1]);
+            // std::cout << "\n========Output * Weight + Bias========" << std::endl;
+            // math::display(activationOutputs[i - 1] * weights[i - 1] + biases[i - 1]);
+            // std::cout << "\n========Activated Output========" << std::endl;
+            // math::display(applyActivationFunction(outputs[i]));
+            // std::cout << std::endl;
             if (i + 1 < layerNum) {
                 outputs[i + 1] = activationOutputs[i];
             }
-            // Debug
-            // std::cout << "Layer " << i - 1 << std::endl;
-            // std::cout << "========Weights========" << std::endl;
-            // math::display(weights.at(i - 1));
-            // std::cout << "\n========Biases========" << std::endl;
-            // math::display(biases.at(i - 1));
-            // std::cout << "\n========Output After Activation========" << std::endl;
-            // math::display(activationOutputs[i]);
-            // std::cout << std::endl;
         }
         return activationOutputs.back();
     }
@@ -154,12 +168,22 @@ namespace ai {
     }
 
     template <typename T>
-    void NeuralNetwork<T>::activationFunction() {
+    NeuralNetwork<T>::aFunc& NeuralNetwork<T>::activationFunction() {
         return actFunc;
     }
 
     template <typename T>
-    void NeuralNetwork<T>::costFunction() {
+    NeuralNetwork<T>::cFunc& NeuralNetwork<T>::costFunction() {
+        return costFunc;
+    }
+
+    template <typename T>
+    const NeuralNetwork<T>::aFunc& NeuralNetwork<T>::activationFunction() const {
+        return actFunc;
+    }
+
+    template <typename T>
+    const NeuralNetwork<T>::cFunc& NeuralNetwork<T>::costFunction() const {
         return costFunc;
     }
 
@@ -168,7 +192,7 @@ namespace ai {
         double weightRange = 2 / sqrt(inputSize);
         for (int i = 0; i < numLayers - 1; ++i) {
             weights[i].randomizeUniform(-weightRange, weightRange);
-            biases[i].randomizeNormal();
+            biases[i].randomizeNormal(0, weightRange);
         }
     }
 
@@ -192,7 +216,7 @@ namespace ai {
             // // Launch kernel where numThreads = size of matrix.
             dim3 blocks(std::ceil(rawSize / (float) THREADS_PER_BLOCK));
             dim3 threads(THREADS_PER_BLOCK);
-            switch (activationFunction) {
+            switch (activationFunction()) {
                 case SIGMOID:
                 activationFunctionSigmoid<<<blocks, threads>>>(dev_mat, layer.size());
                 break;
@@ -210,9 +234,7 @@ namespace ai {
         math::Matrix<T> out = math::Matrix<T>(layer.numRows(), layer.numColumns());
         switch (activationFunction()) {
             case SIGMOID:
-                out = applyActivationFunction(layer);
-                out = out.hadamard(1 - out);
-
+                out = layer.hadamard(1 - layer);
                 break;
         }
         return out;
@@ -235,7 +257,7 @@ namespace ai {
         math::Matrix<T> error;
         switch (costFunction()) {
             case MSE:
-                error = output - expectedOutput;
+                error = expectedOutput - output;
                 break;
         }
         return error;
