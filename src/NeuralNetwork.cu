@@ -48,7 +48,7 @@ namespace ai {
         // math::display(applyActivationFunctionDerivative(activationOutputs.back()));
         // std::cout << std::endl;
         deltas.back() = costDerivative(activationOutputs.back(), desiredOutput).hadamard(applyActivationFunctionDerivative(activationOutputs.back()));
-        for (int i = numLayers - 3; i >= 0; --i) {
+        for (int i = deltas.size() - 2; i >= 0; --i) {
             // Debug
             // std::cout << "Layer " << i + 1 << std::endl;
             // std::cout << "========Weights========" << std::endl;
