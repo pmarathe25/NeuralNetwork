@@ -60,7 +60,7 @@ namespace ai {
             // std::cout << "\n========Output After Activation Derivative========" << std::endl;
             // math::display(applyActivationFunctionDerivative(activationOutputs[i + 1]));
             // std::cout << std::endl;
-            deltas[i] = (deltas[i + 1] * weights[i + 1].transpose()).hadamard(applyActivationFunctionDerivative(activationOutputs[i]));
+            deltas[i] = (deltas[i + 1] * weights[i + 1].transpose()).hadamard(applyActivationFunctionDerivative(activationOutputs[i + 1]));
         }
         // Gradients for each layers.
         std::vector<math::Matrix<T> > weightDeltas;
@@ -83,9 +83,9 @@ namespace ai {
             weightDeltas.push_back((activationOutputs[i].rowMean().transpose()).kronecker(deltas[i]));
             biasDeltas.push_back(deltas[i]);
         }
-        for (int i = 0; i < weights.size(); ++i) {
-            weights[i] = weights[i] + (learningRate * weightDeltas[i]);
-            biases[i] = biases[i] + (learningRate * biasDeltas[i]);
+        for (int i = 0; i < weightDeltas.size(); ++i) {
+            weights[i] = weights[i] - (learningRate * weightDeltas[i]);
+            biases[i] = biases[i] - (learningRate * biasDeltas[i]);
         }
     }
 
@@ -231,10 +231,10 @@ namespace ai {
 
     template <typename T>
     math::Matrix<T> NeuralNetwork<T>::applyActivationFunctionDerivative(const math::Matrix<T>& layer) const {
-        math::Matrix<T> out = math::Matrix<T>(layer.numRows(), layer.numColumns());
+        math::Matrix<T> out;
         switch (activationFunction()) {
             case SIGMOID:
-                out = layer.hadamard(1 - layer);
+                out = (layer.hadamard(1 - layer)).rowMean();
                 break;
         }
         return out;
@@ -246,7 +246,7 @@ namespace ai {
         switch (costFunction()) {
             case MSE:
                 error = expectedOutput - output;
-                error = error.dot(error) * (1 / (2.0 * inputSize));
+                error = (error.dot(error) * 0.5).rowMean();
                 break;
         }
         return error;
@@ -257,7 +257,7 @@ namespace ai {
         math::Matrix<T> error;
         switch (costFunction()) {
             case MSE:
-                error = expectedOutput - output;
+                error = (output - expectedOutput).rowMean();
                 break;
         }
         return error;

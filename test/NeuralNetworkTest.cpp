@@ -8,7 +8,7 @@ int main() {
     math::Matrix<double> desiredOutput = math::Matrix<double>({1, 1, 1});
     math::Matrix<double> desiredOutput2 = math::Matrix<double>({0, 0, 0});
     // math::display(input);
-    ai::NeuralNetwork<double> net = ai::NeuralNetwork<double>({1, 3});
+    ai::NeuralNetwork<double> net = ai::NeuralNetwork<double>({1, 1, 3});
     std::cout << "Created network." << std::endl;
     std::cout << "Saving weights..." << std::endl;
     net.saveWeights("test/weights");
@@ -23,6 +23,7 @@ int main() {
     }
     math::display(net.feedForward(input));
     math::display(net.feedForward(0.2));
+    math::display(net.feedForward(0.7));
     // ai::NeuralNetwork<float> net2;
     // std::cout << "Created network 2." << std::endl;
     // std::cout << "Reading weights..." << std::endl;
