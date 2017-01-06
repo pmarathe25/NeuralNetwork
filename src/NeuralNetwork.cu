@@ -67,21 +67,29 @@ namespace ai {
         std::vector<math::Matrix<T> > biasDeltas;
         // Compute gradients.
         for (int i = 0; i < deltas.size(); ++i) {
+            // TODO: Compute average activationOutputs[i] and deltas[i] by performig a row average.
+            // deltas[i] = deltas[i].rowMean();
+            weightDeltas.push_back(deltas[i].kronecker(activationOutputs[i].rowMean()));
+            biasDeltas.push_back(deltas[i]);
             // Debug
             // std::cout << "Layer " << i + 1 << std::endl;
             // std::cout << "========Outputs transpose========" << std::endl;
             // math::display(activationOutputs[i].transpose());
+            // std::cout << "========Outputs transpose rowMean========" << std::endl;
+            // math::display(activationOutputs[i].transpose().rowMean());
+            // std::cout << activationOutputs[i].transpose().rowMean().size() << std::endl;
+            // std::cout << "========Outputs rowMean transpose========" << std::endl;
+            // math::display(activationOutputs[i].rowMean().transpose());
+            //
             // std::cout << "\n========Deltas========" << std::endl;
             // math::display(deltas[i]);
             // std::cout << "\n========Kronecker========" << std::endl;
-            // math::display((activationOutputs[i].transpose()).kronecker(deltas[i]));
+            // math::display((activationOutputs[i].transpose().rowMean()).kronecker(deltas[i]));
             // std::cout << "========Weights========" << std::endl;
             // math::display(weights[i]);
+            // std::cout << "========Weight Deltas========" << std::endl;
+            // math::display(weightDeltas[i]);
             // std::cout << std::endl;
-            // TODO: Compute average activationOutputs[i] and deltas[i] by performig a row average.
-            deltas[i] = deltas[i].rowMean();
-            weightDeltas.push_back((activationOutputs[i].rowMean().transpose()).kronecker(deltas[i]));
-            biasDeltas.push_back(deltas[i]);
         }
         for (int i = 0; i < weightDeltas.size(); ++i) {
             weights[i] = weights[i] - (learningRate * weightDeltas[i]);
@@ -234,7 +242,7 @@ namespace ai {
         math::Matrix<T> out;
         switch (activationFunction()) {
             case SIGMOID:
-                out = (layer.hadamard(1 - layer));//.rowMean();
+                out = (layer.hadamard(1 - layer)).rowMean();
                 break;
         }
         return out;
@@ -246,7 +254,7 @@ namespace ai {
         switch (costFunction()) {
             case MSE:
                 error = expectedOutput - output;
-                error = (error.dot(error) * 0.5);//.rowMean();
+                error = (error.dot(error) * 0.5).rowMean();
                 break;
         }
         return error;
@@ -257,7 +265,7 @@ namespace ai {
         math::Matrix<T> error;
         switch (costFunction()) {
             case MSE:
-                error = (output - expectedOutput);//.rowMean();
+                error = (output - expectedOutput).rowMean();
                 break;
         }
         return error;
