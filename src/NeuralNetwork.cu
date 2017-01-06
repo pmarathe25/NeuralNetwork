@@ -234,7 +234,7 @@ namespace ai {
         math::Matrix<T> out;
         switch (activationFunction()) {
             case SIGMOID:
-                out = (layer.hadamard(1 - layer)).rowMean();
+                out = (layer.hadamard(1 - layer));//.rowMean();
                 break;
         }
         return out;
@@ -246,7 +246,7 @@ namespace ai {
         switch (costFunction()) {
             case MSE:
                 error = expectedOutput - output;
-                error = (error.dot(error) * 0.5).rowMean();
+                error = (error.dot(error) * 0.5);//.rowMean();
                 break;
         }
         return error;
@@ -257,7 +257,7 @@ namespace ai {
         math::Matrix<T> error;
         switch (costFunction()) {
             case MSE:
-                error = (output - expectedOutput).rowMean();
+                error = (output - expectedOutput);//.rowMean();
                 break;
         }
         return error;
