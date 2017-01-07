@@ -74,7 +74,7 @@ namespace ai {
             // std::cout << "\n========Deltas========" << std::endl;
             // math::display(deltas[i]);
             // Get average weight deltas instead of the sum so learning rate is not affected.
-            T scaleFactor = 1 / (double) deltas[i].numRows();
+            T scaleFactor = 1 / (double) input.numRows();
             weightDeltas.push_back((activationOutputs[i].transpose() * deltas[i]) * scaleFactor);
             biasDeltas.push_back(deltas[i].rowMean());
             // Debug
@@ -237,7 +237,7 @@ namespace ai {
         math::Matrix<T> out;
         switch (activationFunction()) {
             case SIGMOID:
-                out = (layer.hadamard(1 - layer));//.rowMean();
+                out = (layer.hadamard(1 - layer));
                 break;
         }
         return out;
@@ -249,7 +249,7 @@ namespace ai {
         switch (costFunction()) {
             case MSE:
                 error = expectedOutput - output;
-                error = (error.dot(error) * 0.5);//.rowMean();
+                error = (error.dot(error) * 0.5);
                 break;
         }
         return error;
@@ -260,7 +260,7 @@ namespace ai {
         math::Matrix<T> error;
         switch (costFunction()) {
             case MSE:
-                error = (output - expectedOutput);//.rowMean();
+                error = (output - expectedOutput);
                 break;
         }
         return error;
