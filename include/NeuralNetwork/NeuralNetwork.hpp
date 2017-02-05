@@ -44,8 +44,8 @@ namespace ai {
             // Initialization.
             void initializeWeights();
             // Helper functions.
-            math::Matrix<T> applyActivationFunction(const math::Matrix<T>& layer) const;
-            math::Matrix<T> applyActivationFunctionDerivative(const math::Matrix<T>& layer) const;
+            void computeActivationFunction(int layerNum);
+            math::Matrix<T> computeActivationFunctionDerivative(int layerNum) const;
             math::Matrix<T> cost(const math::Matrix<T>& output, const math::Matrix<T>& expectedOutput);
             math::Matrix<T> costDerivative(const math::Matrix<T>& output, const math::Matrix<T>& expectedOutput);
             math::Matrix<T> applySigmoidCPU(const math::Matrix<T>& layer) const ;

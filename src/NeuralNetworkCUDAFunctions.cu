@@ -3,10 +3,10 @@
 
 namespace ai {
     template <typename T>
-    __global__ void activationFunctionSigmoid(T* mat, int size) {
+    __global__ void activationFunctionSigmoid(T* mat, int size, T* output) {
         int index = blockIdx.x * blockDim.x + threadIdx.x;
         if (index < size) {
-            mat[index] = 1 / (1 + exp(-1 * mat[index]));
+            output[index] = 1 / (1 + exp(-mat[index]));
         }
     }
 }
