@@ -8,7 +8,7 @@
 namespace ai {
     template <typename T>
     NeuralNetwork<T>::NeuralNetwork(aFunc func, cFunc func2) {
-        actFunc = func;
+        activationFunc = func;
         costFunc = func2;
     }
 
@@ -107,9 +107,22 @@ namespace ai {
         outputs[0] = input;
         activationOutputs[0] = outputs[0];
         for (int i = 1; i < layerNum; ++i) {
-            outputs[i] = (activationOutputs[i - 1] * weights[i - 1]).addVector(biases[i - 1]);
+            // outputs[i] = (activationOutputs[i - 1] * weights[i - 1]).addVector(biases[i - 1]);
+            if (outputs[i].numRows() == 1) {
+                outputs[i] = math::Matrix<T>(input.numRows(), outputs[i].numColumns());
+                activationOutputs[i] = math::Matrix<T>(input.numRows(), outputs[i].numColumns());
+            }
+
+            dim3 blocks(std::ceil(outputs[i].numRows() / (float) BLOCK_DIM), std::ceil(outputs[i].numColumns() / (float) BLOCK_DIM));
+            dim3 threads(BLOCK_DIM, BLOCK_DIM);
+            activationOutputs[i] = math::Matrix<T>(outputs[i].numRows(), outputs[i].numColumns());
+
+            computeFeedForward<<<blocks, threads>>>(activationOutputs[i - 1].data(), weights[i - 1].data(), biases[i - 1].data(),
+                activationOutputs[i - 1].numRows(), activationOutputs[i - 1].numColumns(), weights[i - 1].numColumns(),
+                activationOutputs[i - 1].size(), weights[i - 1].size(), outputs[i].data(), activationOutputs[i].data(), activationFunc);
+            cudaDeviceSynchronize();
             // Save this output as input to the next layer.
-            computeActivationFunction(i);
+            // computeActivationFunction(i);
             // Debug
             // std::cout << "Layer " << i - 1 << std::endl;
             // std::cout << "========Input========" << std::endl;
@@ -118,17 +131,19 @@ namespace ai {
             // weights[i - 1].display();
             // std::cout << "\n========Biases========" << std::endl;
             // biases[i - 1].display();
-            // std::cout << "\n========Output * Weight========" << std::endl;
+            // std::cout << "\n========Input * Weight========" << std::endl;
             // (activationOutputs[i - 1] * weights[i - 1]).display();
-            // std::cout << "\n========Output * Weight + Bias========" << std::endl;
+            // std::cout << "\n========Input * Weight + Bias========" << std::endl;
             // (activationOutputs[i - 1] * weights[i - 1]).addVector(biases[i - 1]).display();
+            // std::cout << "\n========Output========" << std::endl;
+            // outputs[i].display();
             // std::cout << "\n========Activated Output========" << std::endl;
             // activationOutputs[i].display();
             // std::cout << std::endl;
             // End Debug
-            if (i + 1 < layerNum) {
-                outputs[i + 1] = activationOutputs[i];
-            }
+            // if (i + 1 < layerNum) {
+            //     outputs[i + 1] = activationOutputs[i];
+            // }
         }
         return activationOutputs.back();
     }
@@ -178,7 +193,7 @@ namespace ai {
 
     template <typename T>
     NeuralNetwork<T>::aFunc& NeuralNetwork<T>::activationFunction() {
-        return actFunc;
+        return activationFunc;
     }
 
     template <typename T>
@@ -188,7 +203,7 @@ namespace ai {
 
     template <typename T>
     const NeuralNetwork<T>::aFunc& NeuralNetwork<T>::activationFunction() const {
-        return actFunc;
+        return activationFunc;
     }
 
     template <typename T>
@@ -206,24 +221,17 @@ namespace ai {
     }
 
     template <typename T>
-    void NeuralNetwork<T>::computeActivationFunction(int layerNum) {
-        // // Launch kernel where numThreads = size of matrix.
-        dim3 blocks(std::ceil(outputs[layerNum].size() / (float) THREADS_PER_BLOCK));
-        dim3 threads(THREADS_PER_BLOCK);
-        switch (activationFunction()) {
-            case SIGMOID:
-                activationOutputs[layerNum] = math::Matrix<T>(outputs[layerNum].numRows(), outputs[layerNum].numColumns());
-                activationFunctionSigmoid<<<blocks, threads>>>(outputs[layerNum].data(), outputs[layerNum].size(), activationOutputs[layerNum].data());
-                cudaDeviceSynchronize();
-                break;
-        }
-    }
-
-    template <typename T>
     math::Matrix<T> NeuralNetwork<T>::computeActivationFunctionDerivative(int layerNum) const {
         switch (activationFunction()) {
             case SIGMOID:
                 return activationOutputs[layerNum].hadamard(1 - activationOutputs[layerNum]);
+            case ANALYTIC:
+                math::Matrix<T> output = activationOutputs[layerNum];
+                dim3 blocks(std::ceil(output.size() / (float) THREADS_PER_BLOCK));
+                dim3 threads(THREADS_PER_BLOCK);
+                activationFunctionSigmoid<<<blocks, threads>>>(activationOutputs[layerNum].data(), output.size(), output.data());
+                cudaDeviceSynchronize();
+                return output;
         }
         return T();
     }

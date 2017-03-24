@@ -8,13 +8,14 @@ namespace ai {
         public:
             enum aFunc {
                 SIGMOID = 0,
+                ANALYTIC,
             };
             enum cFunc {
                 MSE = 0,
             };
             // Constructors.
             NeuralNetwork(aFunc func = SIGMOID, cFunc func2 = MSE);
-            NeuralNetwork(std::vector<int> layers, aFunc func = SIGMOID, cFunc func2 = MSE);
+            NeuralNetwork(std::vector<int> layers, aFunc func = ANALYTIC, cFunc func2 = MSE);
             // Usage methods.
             void train(const math::Matrix<T>& input, const math::Matrix<T>& desiredOutput, T learningRate);
             const math::Matrix<T>& feedForward(const math::Matrix<T>& input);
@@ -38,13 +39,12 @@ namespace ai {
             // Error for each layer.
             std::vector<math::Matrix<T> > deltas;
             // Other data members.
-            aFunc actFunc;
+            aFunc activationFunc;
             cFunc costFunc;
             int inputSize, numLayers;
             // Initialization.
             void initializeWeights();
             // Helper functions.
-            void computeActivationFunction(int layerNum);
             math::Matrix<T> computeActivationFunctionDerivative(int layerNum) const;
             math::Matrix<T> cost(const math::Matrix<T>& output, const math::Matrix<T>& expectedOutput);
             math::Matrix<T> costDerivative(const math::Matrix<T>& output, const math::Matrix<T>& expectedOutput);
