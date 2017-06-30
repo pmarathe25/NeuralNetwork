@@ -213,8 +213,8 @@ namespace ai {
 
     template <typename T>
     void NeuralNetwork<T>::initializeWeights() {
-        double weightRange = 2 / sqrt(inputSize);
         for (int i = 0; i < numLayers - 1; ++i) {
+            double weightRange = 2 / sqrt(weights[i].numColumns());
             weights[i].randomizeUniform(-weightRange, weightRange);
             biases[i].randomizeNormal(0, weightRange);
         }
@@ -229,7 +229,7 @@ namespace ai {
                 math::Matrix<T> output = activationOutputs[layerNum];
                 dim3 blocks(std::ceil(output.size() / (float) THREADS_PER_BLOCK));
                 dim3 threads(THREADS_PER_BLOCK);
-                activationFunctionSigmoid<<<blocks, threads>>>(activationOutputs[layerNum].data(), output.size(), output.data());
+                activationFunctionSigmoid<<<blocks, threads>>>(outputs[layerNum].data(), output.size(), output.data());
                 cudaDeviceSynchronize();
                 return output;
         }

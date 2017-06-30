@@ -9,7 +9,7 @@ int main() {
     math::Matrix<float> desiredOutput = math::Matrix<float>({{1, 1, 1}, {0, 0, 0}});
 
     // input.display();
-    ai::NeuralNetwork<float> net = ai::NeuralNetwork<float>({3, 10, 3}, ai::NeuralNetwork<float>::ANALYTIC);
+    ai::NeuralNetwork<float> net = ai::NeuralNetwork<float>({3, 100, 3}, ai::NeuralNetwork<float>::ANALYTIC);
     std::cout << "Created network." << std::endl;
     std::cout << "Saving weights..." << std::endl;
     net.saveWeights("test/weights");
@@ -17,7 +17,7 @@ int main() {
     std::cout << std::endl;
     net.feedForward(desiredOutput).display();
     std::cout << std::endl;
-    for (int i = 0; i < 2000; ++i) {
+    for (int i = 0; i < 1000; ++i) {
         // net.train(input, desiredOutput, 0.01);
         // net.train(input2, desiredOutput2, 0.01);
         net.train(desiredOutput, desiredOutput, 0.01);
