@@ -48,7 +48,6 @@ namespace ai {
             math::Matrix<T> computeActivationFunctionDerivative(int layerNum) const;
             math::Matrix<T> cost(const math::Matrix<T>& output, const math::Matrix<T>& expectedOutput);
             math::Matrix<T> costDerivative(const math::Matrix<T>& output, const math::Matrix<T>& expectedOutput);
-            math::Matrix<T> applySigmoidCPU(const math::Matrix<T>& layer) const ;
     };
 }
 
