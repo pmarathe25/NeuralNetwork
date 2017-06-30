@@ -214,7 +214,7 @@ namespace ai {
     template <typename T>
     void NeuralNetwork<T>::initializeWeights() {
         for (int i = 0; i < numLayers - 1; ++i) {
-            double weightRange = 2 / sqrt(weights[i].numColumns());
+            double weightRange = 2 / sqrt(weights[i].numRows());
             weights[i].randomizeUniform(-weightRange, weightRange);
             biases[i].randomizeNormal(0, weightRange);
         }
