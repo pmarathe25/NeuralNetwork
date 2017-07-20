@@ -23,7 +23,6 @@ int main() {
         net.train(desiredOutput, desiredOutput, 0.01);
     }
     net.feedForward(desiredOutput).display();
-    input1.display();
     net.feedForward(input0).display();
     net.feedForward(input1).display();
     // net.feedForward({0.7, 0.7, 0.7}).display();
