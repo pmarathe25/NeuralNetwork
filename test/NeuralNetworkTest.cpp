@@ -3,13 +3,13 @@
 #include <math.h>
 
 int main() {
-    math::Matrix<float> input0 = math::Matrix<float>({1, 1, 1});
-    math::Matrix<float> input1 = math::Matrix<float>({0, 0, 0});
+    math::Matrix<float> input0 = math::Matrix<float>({0.90, 0.90, 0.90});
+    math::Matrix<float> input1 = math::Matrix<float>({0.5, 0.5, 0.5});
 
-    math::Matrix<float> desiredOutput = math::Matrix<float>({{1, 1, 1}, {0, 0, 0}});
+    math::Matrix<float> desiredOutput = math::Matrix<float>({{1, 1, 1}, {0.75, 0.75, 0.75}, {0.5, 0.5, 0.5}, {0.25, 0.25, 0.25}, {0, 0, 0}});
 
     // input.display();
-    ai::NeuralNetwork<float> net = ai::NeuralNetwork<float>({3, 100, 3}, ai::NeuralNetwork<float>::ANALYTIC);
+    ai::NeuralNetwork<float> net = ai::NeuralNetwork<float>({3, 500, 3}, ai::NeuralNetwork<float>::ANALYTIC);
     std::cout << "Created network." << std::endl;
     std::cout << "Saving weights..." << std::endl;
     net.saveWeights("test/weights");
@@ -17,12 +17,15 @@ int main() {
     std::cout << std::endl;
     net.feedForward(desiredOutput).display();
     std::cout << std::endl;
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 2000; ++i) {
         // net.train(input, desiredOutput, 0.01);
         // net.train(input2, desiredOutput2, 0.01);
         net.train(desiredOutput, desiredOutput, 0.01);
     }
     net.feedForward(desiredOutput).display();
+    input1.display();
+    net.feedForward(input0).display();
+    net.feedForward(input1).display();
     // net.feedForward({0.7, 0.7, 0.7}).display();
     ai::NeuralNetwork<float> net2;
     std::cout << "Created network 2." << std::endl;

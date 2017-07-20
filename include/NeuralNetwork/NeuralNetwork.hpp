@@ -10,11 +10,24 @@ namespace ai {
                 SIGMOID = 0,
                 ANALYTIC,
             };
+
             enum cFunc {
                 MSE = 0,
             };
+            class Layer {
+                public:
+                    Layer();
+                    Layer(int inputSize, int outputSize, aFunc activation = ANALYTIC, cFunc cost = MSE);
+                    Layer(math::Matrix<T> weights, math::Matrix<T> biases, aFunc activation = ANALYTIC, cFunc cost = MSE);
+                    math::Matrix<T> feedForward(const math::Matrix<T>& input);
+                    void initializeWeights();
+                private:
+                    aFunc activation;
+                    cFunc cost;
+                    math::Matrix<T> weights, biases;
+            };
             // Constructors.
-            NeuralNetwork(aFunc func = SIGMOID, cFunc func2 = MSE);
+            NeuralNetwork(aFunc func = ANALYTIC, cFunc func2 = MSE);
             NeuralNetwork(std::vector<int> layers, aFunc func = ANALYTIC, cFunc func2 = MSE);
             // Usage methods.
             void train(const math::Matrix<T>& input, const math::Matrix<T>& desiredOutput, T learningRate);

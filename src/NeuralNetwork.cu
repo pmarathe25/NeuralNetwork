@@ -108,11 +108,12 @@ namespace ai {
         activationOutputs[0] = outputs[0];
         for (int i = 1; i < layerNum; ++i) {
             // outputs[i] = (activationOutputs[i - 1] * weights[i - 1]).addVector(biases[i - 1]);
-            if (outputs[i].numRows() == 1) {
-                outputs[i] = math::Matrix<T>(input.numRows(), outputs[i].numColumns());
-                activationOutputs[i] = math::Matrix<T>(input.numRows(), outputs[i].numColumns());
-            }
+            // if (outputs[i].numRows() == 1) {
+            //     outputs[i] = math::Matrix<T>(input.numRows(), outputs[i].numColumns());
+            //     activationOutputs[i] = math::Matrix<T>(input.numRows(), outputs[i].numColumns());
+            // }
 
+            outputs[i] = math::Matrix<T>(input.numRows(), weights[i - 1].numColumns());
             dim3 blocks(std::ceil(outputs[i].numRows() / (float) BLOCK_DIM), std::ceil(outputs[i].numColumns() / (float) BLOCK_DIM));
             dim3 threads(BLOCK_DIM, BLOCK_DIM);
             activationOutputs[i] = math::Matrix<T>(outputs[i].numRows(), outputs[i].numColumns());
