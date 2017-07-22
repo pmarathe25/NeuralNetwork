@@ -217,11 +217,11 @@ namespace ai {
         for (int i = 0; i < numLayers - 1; ++i) {
             double weightRange = 2 / sqrt(weights[i].numRows());
             if (activationFunc == RELU) {
-                weights[i].randomizeUniform(0, weightRange);
-                biases[i].randomizeNormal(0, weightRange).template applyFunction<abs>();
+                weights[i] = randomUniformLike(weights[i], 0, weightRange);
+                biases[i] = randomNormalLike(biases[i], 0, weightRange).template applyFunction<abs>();
             } else {
-                weights[i].randomizeUniform(-weightRange, weightRange);
-                biases[i].randomizeNormal(0, weightRange);
+                weights[i] = randomUniformLike(weights[i], -weightRange, weightRange);
+                biases[i] = randomNormalLike(biases[i], 0, weightRange);
             }
         }
     }

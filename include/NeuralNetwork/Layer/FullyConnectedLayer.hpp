@@ -5,7 +5,7 @@
 #include <iostream>
 
 namespace ai {
-    template <typename T, activationFunction aFunc>
+    template <typename T, T (*activationFunc)(T)>
     class FullyConnectedLayer : Layer<T> {
     public:
         FullyConnectedLayer(int inputSize, int outputSize) {
@@ -20,26 +20,17 @@ namespace ai {
         }
 
         math::Matrix<T> feedForward(const math::Matrix<T>& input) {
-            switch (aFunc) {
-                case SIGMOID:
-                    return (input * weights).addVector(biases).template applyFunction<sigmoid>();
-                case ANALYTIC:
-                    return (input * weights).addVector(biases).template applyFunction<analytic>();
-                case RELU:
-                    return (input * weights).addVector(biases).template applyFunction<relu>();
-                default:
-                    return (input * weights).addVector(biases).template applyFunction<sigmoid>();
-            }
+            return (input * weights).addVector(biases).template applyFunction<activationFunc>();
         }
 
         void initializeWeights() {
             double weightRange = 2 / sqrt(weights.numRows());
-            if (aFunc == RELU) {
-                weights.randomizeUniform(0, weightRange);
-                biases.randomizeNormal(0, weightRange).template applyFunction<abs>();
+            if (activationFunc == static_cast<T (*)(T)>(relu<T>)) {
+                weights = randomUniformLike(weights, 0, weightRange);
+                biases = randomNormalLike(biases, 0, weightRange).template applyFunction<abs>();
             } else {
-                weights.randomizeUniform(-weightRange, weightRange);
-                biases.randomizeNormal(0, weightRange);
+                weights = randomUniformLike(weights, -weightRange, weightRange);
+                biases = randomNormalLike(biases, 0, weightRange);
             }
         }
     private:
