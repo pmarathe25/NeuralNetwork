@@ -9,6 +9,12 @@ namespace ai {
         return 1 / (1 + exp(-in));
     }
 
+    enum activationFunction {
+        SIGMOID = 0,
+        ANALYTIC,
+        RELU,
+    };
+
     template <typename T>
     class Layer {
     public:

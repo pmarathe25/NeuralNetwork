@@ -3,7 +3,7 @@
 #include "NeuralNetwork/Layer/Layer.hpp"
 
 namespace ai {
-    template <typename T>
+    template <typename T, activationFunction aFunc>
     class FullyConnectedLayer : Layer<T> {
     public:
         FullyConnectedLayer(int inputSize, int outputSize);
