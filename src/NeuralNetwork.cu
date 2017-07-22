@@ -216,8 +216,13 @@ namespace ai {
     void NeuralNetwork<T>::initializeWeights() {
         for (int i = 0; i < numLayers - 1; ++i) {
             double weightRange = 2 / sqrt(weights[i].numRows());
-            weights[i].randomizeUniform(-weightRange, weightRange);
-            biases[i].randomizeNormal(0, weightRange);
+            if (activationFunc == RELU) {
+                weights[i].randomizeUniform(0, weightRange);
+                biases[i].randomizeNormal(0, weightRange).template applyFunction<abs>();
+            } else {
+                weights[i].randomizeUniform(-weightRange, weightRange);
+                biases[i].randomizeNormal(0, weightRange);
+            }
         }
     }
 
@@ -226,13 +231,22 @@ namespace ai {
         switch (activationFunction()) {
             case SIGMOID:
                 return activationOutputs[layerNum].hadamard(1 - activationOutputs[layerNum]);
-            case ANALYTIC:
+            case ANALYTIC: {
                 math::Matrix<T> output = activationOutputs[layerNum];
                 dim3 blocks(std::ceil(output.size() / (float) THREADS_PER_BLOCK));
                 dim3 threads(THREADS_PER_BLOCK);
                 activationFunctionSigmoid<<<blocks, threads>>>(outputs[layerNum].data(), output.size(), output.data());
                 cudaDeviceSynchronize();
                 return output;
+            }
+            case RELU: {
+                math::Matrix<T> output = activationOutputs[layerNum];
+                dim3 blocks(std::ceil(output.size() / (float) THREADS_PER_BLOCK));
+                dim3 threads(THREADS_PER_BLOCK);
+                activationFunctionRELUDerivative<<<blocks, threads>>>(outputs[layerNum].data(), output.size(), output.data());
+                cudaDeviceSynchronize();
+                return output;
+            }
         }
         return T();
     }

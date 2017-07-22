@@ -28,9 +28,9 @@ $(BUILDDIR)/FullyConnectedLayer.o: include/NeuralNetwork/Layer/Layer.hpp include
 $(TESTDIR)/NeuralNetworkTest: $(TESTOBJS) $(MATLIB)
 	$(CXX) $(TESTLFLAGS) $(TESTOBJS) $(LIBS) $(MATLIB) -o $(TESTDIR)/NeuralNetworkTest
 
-$(BUILDDIR)/NeuralNetworkTest.o: $(TESTDIR)/NeuralNetworkTest.cpp include/NeuralNetwork/NeuralNetwork.hpp \
+$(BUILDDIR)/NeuralNetworkTest.o: $(TESTDIR)/NeuralNetworkTest.cu include/NeuralNetwork/NeuralNetwork.hpp \
 	$(LIBDIR)/NeuralNetwork/libneuralnetwork.so
-	$(CXX) $(CFLAGS) $(TESTDIR)/NeuralNetworkTest.cpp -o $(BUILDDIR)/NeuralNetworkTest.o
+	$(CXX) $(CFLAGS) $(TESTDIR)/NeuralNetworkTest.cu -o $(BUILDDIR)/NeuralNetworkTest.o
 
 clean:
 	rm $(OBJS) $(TESTOBJS) $(LIBDIR)/NeuralNetwork/libneuralnetwork.so

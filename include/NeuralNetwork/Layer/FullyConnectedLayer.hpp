@@ -3,19 +3,16 @@
 #include "NeuralNetwork/Layer/Layer.hpp"
 
 namespace ai {
-    namespace NeuralNetwork {
-        template <typename T>
-        class FullyConnectedLayer : Layer<T> {
-        public:
-            FullyConnectedLayer();
-            FullyConnectedLayer(int inputSize, int outputSize);
-            FullyConnectedLayer(math::Matrix<T> weights, math::Matrix<T> biases);
-            math::Matrix<T> feedForward(const math::Matrix<T>& input);
-            void initializeWeights();
-        private:
-            math::Matrix<T> weights, biases;
-        };
-    }
+    template <typename T>
+    class FullyConnectedLayer : Layer<T> {
+    public:
+        FullyConnectedLayer(int inputSize, int outputSize);
+        FullyConnectedLayer(math::Matrix<T> weights, math::Matrix<T> biases);
+        math::Matrix<T> feedForward(const math::Matrix<T>& input);
+        void initializeWeights();
+    private:
+        math::Matrix<T> weights, biases;
+    };
 }
 
 #endif

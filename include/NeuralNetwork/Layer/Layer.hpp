@@ -4,15 +4,17 @@
 
 
 namespace ai {
-    namespace NeuralNetwork {
-        template <typename T>
-        class Layer {
-        public:
-            Layer() {}
-            virtual math::Matrix<T> feedForward(const math::Matrix<T>& input) = 0;
-            virtual void initializeWeights() = 0;
-        };
+    template <typename T>
+    __device__ T sigmoid(T in) {
+        return 1 / (1 + exp(-in));
     }
+
+    template <typename T>
+    class Layer {
+    public:
+        virtual math::Matrix<T> feedForward(const math::Matrix<T>& input) = 0;
+        virtual void initializeWeights() = 0;
+    };
 }
 
 #endif

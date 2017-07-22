@@ -9,6 +9,7 @@ namespace ai {
             enum aFunc {
                 SIGMOID = 0,
                 ANALYTIC,
+                RELU,
             };
 
             enum cFunc {
