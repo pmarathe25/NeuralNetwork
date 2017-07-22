@@ -5,7 +5,7 @@ MATLIB = ~/C++/Math/lib/Math/libmatrix.so
 LIBS = lib/NeuralNetwork/libneuralnetwork.so
 LIBINCLUDEPATH = /home/pranav/C++/Math/include/
 INCLUDEDIR = -Iinclude/ -I$(LIBINCLUDEPATH)
-OBJS = $(addprefix $(BUILDDIR)/, NeuralNetwork.o FullyConnectedLayer.o)
+OBJS = $(addprefix $(BUILDDIR)/, NeuralNetwork.o)
 TESTOBJS = $(BUILDDIR)/NeuralNetworkTest.o
 EXECOBJS =
 TESTDIR = test/
@@ -22,14 +22,11 @@ $(BUILDDIR)/NeuralNetwork.o: include/NeuralNetwork/NeuralNetwork.hpp $(SRCDIR)/N
 	$(SRCDIR)/NeuralNetworkCUDAFunctions.cu
 	$(CXX) $(CFLAGS) $(SRCDIR)/NeuralNetwork.cu -o $(BUILDDIR)/NeuralNetwork.o
 
-$(BUILDDIR)/FullyConnectedLayer.o: include/NeuralNetwork/Layer/Layer.hpp include/NeuralNetwork/Layer/FullyConnectedLayer.hpp $(SRCDIR)/Layer/FullyConnectedLayer.cu
-	$(CXX) $(CFLAGS) $(SRCDIR)/Layer/FullyConnectedLayer.cu -o $(BUILDDIR)/FullyConnectedLayer.o
-
 $(TESTDIR)/NeuralNetworkTest: $(TESTOBJS) $(MATLIB)
 	$(CXX) $(TESTLFLAGS) $(TESTOBJS) $(LIBS) $(MATLIB) -o $(TESTDIR)/NeuralNetworkTest
 
-$(BUILDDIR)/NeuralNetworkTest.o: $(TESTDIR)/NeuralNetworkTest.cu include/NeuralNetwork/NeuralNetwork.hpp \
-	$(LIBDIR)/NeuralNetwork/libneuralnetwork.so
+$(BUILDDIR)/NeuralNetworkTest.o: $(TESTDIR)/NeuralNetworkTest.cu include/NeuralNetwork/NeuralNetwork.hpp include/NeuralNetwork/Layer/Layer.hpp \
+	include/NeuralNetwork/Layer/FullyConnectedLayer.hpp $(LIBDIR)/NeuralNetwork/libneuralnetwork.so
 	$(CXX) $(CFLAGS) $(TESTDIR)/NeuralNetworkTest.cu -o $(BUILDDIR)/NeuralNetworkTest.o
 
 clean:
