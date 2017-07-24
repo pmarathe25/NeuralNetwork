@@ -1,6 +1,6 @@
 #ifndef LAYER_H
 #define LAYER_H
-#include "Math/Matrix.hpp"
+#include "Matrix.hpp"
 
 namespace ai {
     template <typename T>

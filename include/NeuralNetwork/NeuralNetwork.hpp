@@ -1,6 +1,6 @@
 #ifndef NEURAL_NETWORK_H
 #define NEURAL_NETWORK_H
-#include "Math/Matrix.hpp"
+#include "Matrix.hpp"
 
 namespace ai {
     template <typename T>

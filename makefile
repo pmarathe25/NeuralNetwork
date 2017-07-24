@@ -1,10 +1,10 @@
 BUILDDIR = build/
 BINDIR = bin/
 LIBDIR = $(CURDIR)/lib/
-MATLIB = ~/C++/Math/lib/Math/libmatrix.so
+LIBMAT = ~/C++/Math/lib/libmatrix.so
+LIBMATINCLUDEPATH = /home/pranav/C++/Math/include/
 LIBS = lib/NeuralNetwork/libneuralnetwork.so
-LIBINCLUDEPATH = /home/pranav/C++/Math/include/
-INCLUDEDIR = -Iinclude/ -I$(LIBINCLUDEPATH)
+INCLUDEDIR = -Iinclude/ -I$(LIBMATINCLUDEPATH)
 OBJS = $(addprefix $(BUILDDIR)/, NeuralNetwork.o)
 TESTOBJS = $(BUILDDIR)/NeuralNetworkTest.o
 EXECOBJS =
@@ -13,7 +13,7 @@ SRCDIR = src/
 CXX = nvcc
 CFLAGS = -arch=sm_35 -Xcompiler -fPIC -Wno-deprecated-gpu-targets -c -std=c++11 $(INCLUDEDIR)
 LFLAGS = -shared -Wno-deprecated-gpu-targets
-TESTLFLAGS = -Wno-deprecated-gpu-targets
+TESTLFLAGS = -Wno-deprecated-gpu-targets 
 
 $(LIBDIR)/NeuralNetwork/libneuralnetwork.so: $(OBJS)
 	$(CXX) $(LFLAGS) $(OBJS) -o $(LIBDIR)/NeuralNetwork/libneuralnetwork.so
@@ -22,8 +22,8 @@ $(BUILDDIR)/NeuralNetwork.o: include/NeuralNetwork/NeuralNetwork.hpp $(SRCDIR)/N
 	$(SRCDIR)/NeuralNetworkCUDAFunctions.cu
 	$(CXX) $(CFLAGS) $(SRCDIR)/NeuralNetwork.cu -o $(BUILDDIR)/NeuralNetwork.o
 
-$(TESTDIR)/NeuralNetworkTest: $(TESTOBJS) $(MATLIB)
-	$(CXX) $(TESTLFLAGS) $(TESTOBJS) $(LIBS) $(MATLIB) -o $(TESTDIR)/NeuralNetworkTest
+$(TESTDIR)/NeuralNetworkTest: $(TESTOBJS) $(LIBMAT)
+	$(CXX) $(TESTLFLAGS) $(TESTOBJS) $(LIBS) $(LIBMAT) -o $(TESTDIR)/NeuralNetworkTest
 
 $(BUILDDIR)/NeuralNetworkTest.o: $(TESTDIR)/NeuralNetworkTest.cu include/NeuralNetwork/NeuralNetwork.hpp include/NeuralNetwork/Layer/Layer.hpp \
 	include/NeuralNetwork/Layer/FullyConnectedLayer.hpp $(LIBDIR)/NeuralNetwork/libneuralnetwork.so

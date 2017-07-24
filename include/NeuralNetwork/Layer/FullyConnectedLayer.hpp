@@ -2,8 +2,6 @@
 #define FULLY_CONNECTED_LAYER_H
 #include "NeuralNetwork/Layer/Layer.hpp"
 
-#include <iostream>
-
 namespace ai {
     template <typename T, T (*activationFunc)(T)>
     class FullyConnectedLayer : Layer<T> {
