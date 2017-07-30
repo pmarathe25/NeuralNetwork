@@ -1,9 +1,10 @@
 #ifndef FULLY_CONNECTED_LAYER_H
 #define FULLY_CONNECTED_LAYER_H
 #include "NeuralNetwork/Layer/Layer.hpp"
+#include "Matrix.hpp"
 
 namespace ai {
-    template <typename Matrix, float (*activationFunc)(float)>
+    template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
     class FullyConnectedLayer : Layer<Matrix> {
     public:
         FullyConnectedLayer(int inputSize, int outputSize) {
@@ -29,8 +30,14 @@ namespace ai {
             return weightedOutput.template applyFunction<activationFunc>();
         }
 
-        inline Matrix backpropagate(const Matrix& networkOutput, const Matrix& expectedOutput) {
-
+        template <Matrix (*costDeriv)(const Matrix&, const Matrix&)>
+        inline Matrix computeBackDeltas(const Matrix& weightedOutput, const Matrix& activationOutput, const Matrix& expectedOutput) {
+            // z: weighted outputs of the layer.
+            // σ: activated outputs of the layer.
+            // C: the cost function.
+            // In order to compute the cost derivative with repect to the weighted inputs,
+            // compute (dC / dz) as (dC / dσ) * (dσ / dz)
+            return costDeriv(activationOutput, expectedOutput).hadamard(weightedOutput.template applyFunction<activationDeriv>());
         }
 
         inline Matrix backpropagate(const Matrix& layerDeltas) {
@@ -41,11 +48,11 @@ namespace ai {
         void initializeWeights() {
             double weightRange = 2 / sqrt(weights.numRows());
             if (activationFunc == static_cast<float (*)(float)>(relu<float>)) {
-                weights = randomUniformLike(weights, 0, weightRange);
-                biases = randomNormalLike(biases, 0, weightRange).template applyFunction<abs>();
+                weights = Matrix::randomUniformLike(weights, 0, weightRange);
+                biases = Matrix::randomNormalLike(biases, 0, weightRange).template applyFunction<abs>();
             } else {
-                weights = randomUniformLike(weights, -weightRange, weightRange);
-                biases = randomNormalLike(biases, 0, weightRange);
+                weights = Matrix::randomUniformLike(weights, -weightRange, weightRange);
+                biases = Matrix::randomNormalLike(biases, 0, weightRange);
             }
         }
     private:
@@ -53,8 +60,11 @@ namespace ai {
     };
 
     // Define some common layers.
-    typedef FullyConnectedLayer<math::Matrix<float>, ai::sigmoid> SigmoidFCL;
-    typedef FullyConnectedLayer<math::Matrix<float>, ai::relu> ReLUFCL;
+    template <float (*activationFunc)(float), float (*activationDeriv)(float)>
+    using FCL = FullyConnectedLayer<Matrix_F, activationFunc, activationDeriv>;
+    // Now with some common activation functions.
+    typedef FCL<ai::sigmoid, ai::sigmoid_prime> SigmoidFCL;
+    typedef FCL<ai::relu, ai::relu_prime> ReLUFCL;
 }
 
 #endif

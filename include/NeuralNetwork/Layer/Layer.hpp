@@ -1,11 +1,16 @@
 #ifndef LAYER_H
 #define LAYER_H
-#include "Matrix.hpp"
 
 namespace ai {
     template <typename T>
     __device__ T sigmoid(T in) {
         return 1 / (1 + exp(-in));
+    }
+
+    template <typename T>
+    __device__ T sigmoid_prime(T in) {
+        T sig = sigmoid(in);
+        return sig * (1- sig);
     }
 
     template <typename T>
@@ -16,6 +21,11 @@ namespace ai {
     template <typename T>
     __device__ T relu(T in) {
         return (in < 0) ? 0 : in;
+    }
+
+    template <typename T>
+    __device__ T relu_prime(T in) {
+        return (in < 0) ? 0 : 1;
     }
 
     enum activationFunction {

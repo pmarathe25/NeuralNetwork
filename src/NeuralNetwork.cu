@@ -227,11 +227,11 @@ namespace ai {
         for (int i = 0; i < numLayers - 1; ++i) {
             double weightRange = 2 / sqrt(weights[i].numRows());
             if (activationFunc == RELU) {
-                weights[i] = randomUniformLike(weights[i], 0, weightRange);
-                biases[i] = randomNormalLike(biases[i], 0, weightRange).template applyFunction<abs>();
+                weights[i] = math::Matrix<T>::randomUniformLike(weights[i], 0, weightRange);
+                biases[i] = math::Matrix<T>::randomNormalLike(biases[i], 0, weightRange).template applyFunction<abs>();
             } else {
-                weights[i] = randomUniformLike(weights[i], -weightRange, weightRange);
-                biases[i] = randomNormalLike(biases[i], 0, weightRange);
+                weights[i] = math::Matrix<T>::randomUniformLike(weights[i], -weightRange, weightRange);
+                biases[i] = math::Matrix<T>::randomNormalLike(biases[i], 0, weightRange);
             }
         }
     }
