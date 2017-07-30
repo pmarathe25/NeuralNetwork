@@ -3,6 +3,7 @@
 #include "NeuralNetwork/Layer/Layer.hpp"
 
 namespace ai {
+
     template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
     class FullyConnectedLayer : Layer<Matrix> {
     public:
@@ -29,19 +30,24 @@ namespace ai {
             return weightedOutput.template applyFunction<activationFunc>();
         }
 
+        // Backpropagation for the last layer.
         template <Matrix (*costDeriv)(const Matrix&, const Matrix&)>
-        inline Matrix computeBackDeltas(const Matrix& weightedOutput, const Matrix& activationOutput, const Matrix& expectedOutput) {
-            // z: weighted outputs of the layer.
-            // σ: activated outputs of the layer.
-            // C: the cost function.
-            // In order to compute the cost derivative with repect to the weighted inputs,
-            // compute (dC / dz) as (dC / dσ) * (dσ / dz)
-            return costDeriv(activationOutput, expectedOutput).hadamard(weightedOutput.template applyFunction<activationDeriv>());
+        inline Matrix backpropagate(const Matrix& input, const Matrix& weightedOutput, const Matrix& activationOutput, const Matrix& expectedOutput, float learningRate) {
+            // z: Weighted outputs of the layer.
+            // σ: Activated outputs of the layer.
+            // C: The cost function.
+            // In order to compute the cost derivative with repect to the weighted inputs, compute (dC / dz) as (dC / dσ) * (dσ / dz)
+            Matrix deltas = costDeriv(activationOutput, expectedOutput).hadamard(weightedOutput.template applyFunction<activationDeriv>());
+            // Use these deltas and then compute an intermediate quantity for the previous layer.
+            return backpropagate(input, deltas, learningRate);
         }
 
-        inline Matrix backpropagate(const Matrix& layerDeltas) {
-
-
+        // Backpropagation for other layers.
+        inline Matrix backpropagate(const Matrix& input, const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate) {
+            // Compute this layer's deltas
+            Matrix deltas = intermediateDeltas.hadamard(weightedOutput.template applyFunction<activationDeriv>());
+            // Use these deltas and then compute an intermediate quantity for the previous layer.
+            return backpropagate(input, deltas, learningRate);
         }
 
         void initializeWeights() {
@@ -56,6 +62,15 @@ namespace ai {
         }
     private:
         Matrix weights, biases;
+        // Processes deltas and computes a quantity for the previous layer.
+        inline Matrix backpropagate(const Matrix& input, const Matrix& deltas, float learningRate) {
+            // For the previous layer.
+            Matrix intermediateDeltas = deltas * weights.transpose();
+            // Modify this layer's weights.
+            weights -= input.transpose() * deltas * learningRate;
+            // Return an intermediate quantity for the previous layer.
+            return intermediateDeltas;
+        }
     };
 }
 // Define some common layers.

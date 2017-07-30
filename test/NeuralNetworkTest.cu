@@ -15,42 +15,44 @@ int main() {
     math::Matrix<float> input({1, 7.5, 5, 2.5, 0, -2.5, -7.5, -10}, 8);
     math::Matrix<float> expectedOutput = input.applyFunction<ai::sigmoid>();
 
-    input.display();
-    ai::NeuralNetwork<float> net({1, 100, 100, 1}, ai::NeuralNetwork<float>::ANALYTIC);
-    std::cout << "Created network." << std::endl;
-    std::cout << "Initial Output" << std::endl;
-    net.feedForward(input).display();
-    // Train
-    for (int i = 0; i < 2000; ++i) {
-        net.train(input, expectedOutput, 0.01);
-    }
-    std::cout << "Actual Output" << std::endl;
-    net.feedForward(input).display();
-
-    std::cout << "Expected Output" << std::endl;
-    expectedOutput.display();
+    // input.display();
+    // ai::NeuralNetwork<float> net({1, 100, 100, 1}, ai::NeuralNetwork<float>::ANALYTIC);
+    // std::cout << "Created network." << std::endl;
+    // std::cout << "Initial Output" << std::endl;
+    // net.feedForward(input).display();
+    // // Train
+    // for (int i = 0; i < 2000; ++i) {
+    //     net.train(input, expectedOutput, 0.01);
+    // }
+    // std::cout << "Actual Output" << std::endl;
+    // net.feedForward(input).display();
     //
+    // std::cout << "Expected Output" << std::endl;
+    // expectedOutput.display();
+    //
+
+
     // Test Layer functionality
-    std::cout << "Testing Fully Connected Layer" << std::endl;
     SigmoidFCL_F testLayer(1, 10);
     ReLUFCL_F testLayer2(10, 1);
-    testLayer.feedForward(input).display();
 
-
-    // LayerManager<SigmoidFCL, ReLUFCL> layerTest(testLayer, testLayer2);
-    // LayerManager<Matrix_F, mse_prime<Matrix_F>, SigmoidFCL, ReLUFCL> layerTest(testLayer, testLayer2);
     NeuralNetwork_MSE_F<SigmoidFCL_F, ReLUFCL_F> layerTest(testLayer, testLayer2);
     std::cout << "Testing Layer Manager feedForward" << std::endl;
-    std::cout << "Expected" << std::endl;
-    testLayer2.feedForward(testLayer.feedForward(input)).display();
-    std::cout << "Actual" << std::endl;
     layerTest.feedForward(input).display();
 
-    std::cout << "Testing Layer Manager getLayerOutput" << std::endl;
+    std::cout << "Testing Layer Manager backpropagate" << std::endl;
     std::cout << "Expected" << std::endl;
-    testLayer.feedForward(input).display();
+    expectedOutput.display();
     std::cout << "Actual" << std::endl;
-    layerTest.getLayerOutput(input).display();
+    layerTest.backpropagate(input, expectedOutput);
+    layerTest.feedForward(input).display();
+
+    std::cout << "Testing Layer Manager training" << std::endl;
+    std::cout << "Expected" << std::endl;
+    expectedOutput.display();
+    std::cout << "Actual" << std::endl;
+    layerTest.train(input, expectedOutput, 0.01);
+    layerTest.feedForward(input).display();
 
     // // Test saving current network
     // std::cout << "Saving weights..." << std::endl;

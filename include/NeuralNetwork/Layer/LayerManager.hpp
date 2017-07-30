@@ -34,13 +34,22 @@ namespace ai {
                 return getLayerOutput<sizeof...(Layers)>(input);
             }
 
-            Matrix backpropagate(const Matrix& input, const Matrix& expectedOutput) {
-                return backpropagateHelper(input, expectedOutput, typename sequenceGenerator<sizeof...(Layers)>::type());
-            }
-
             template <int layerNum = 1>
             Matrix getLayerOutput(const Matrix& input) {
                 return feedForwardHelper(input, typename sequenceGenerator<layerNum>::type());
+            }
+
+            Matrix backpropagate(const Matrix& input, const Matrix& expectedOutput, float learningRate = 0.001) {
+                return backpropagateHelper(learningRate, input, expectedOutput, typename sequenceGenerator<sizeof...(Layers)>::type());
+            }
+
+            template <int traningIters = 2000>
+            void train(const Matrix& input, const Matrix& expectedOutput, float learningRate = 0.001) {
+                // Ask the compiler to unroll this, since we know trainingIters at compile time.
+                #pragma unroll
+                for (int i = traningIters; i > 0; --i) {
+                    backpropagate(input, expectedOutput, learningRate);
+                }
             }
         private:
             // Feed forward unpacker.
@@ -63,25 +72,28 @@ namespace ai {
 
             // Backpropagation unpacker.
             template <int... S>
-            inline Matrix backpropagateHelper(const Matrix& input, const Matrix& expectedOutput, sequence<S...>) {
-                return backpropagateHelper(input, expectedOutput, std::get<S>(layers)...);
+            inline Matrix backpropagateHelper(float learningRate, const Matrix& input, const Matrix& expectedOutput, sequence<S...>) {
+                return backpropagateHelper(learningRate, input, expectedOutput, std::get<S>(layers)...);
             }
 
             // Backpropagation base case.
             template <typename BackLayer>
-            inline Matrix backpropagateHelper(const Matrix& input, const Matrix& expectedOutput, BackLayer& backLayer) {
+            inline Matrix backpropagateHelper(float learningRate, const Matrix& input, const Matrix& expectedOutput, BackLayer& backLayer) {
                 Matrix weightedOutput = backLayer.getWeightedOutput(input);
                 Matrix activationOutput = backLayer.activate(weightedOutput);
-                return backLayer.computeBackDeltas<costDeriv>(weightedOutput, activationOutput, expectedOutput);
+                // This will return intermediate deltas for the layer just before.
+                return backLayer.template backpropagate<costDeriv>(input, weightedOutput, activationOutput, expectedOutput, learningRate);
             }
 
             // Backpropagation recursion.
             template <typename FrontLayer, typename... BackLayers>
-            inline Matrix backpropagateHelper(const Matrix& input, const Matrix& expectedOutput, FrontLayer& frontLayer, BackLayers&... otherLayers) {
+            inline Matrix backpropagateHelper(float learningRate, const Matrix& input, const Matrix& expectedOutput, FrontLayer& frontLayer, BackLayers&... otherLayers) {
                 Matrix layerWeightedOutput = frontLayer.getWeightedOutput(input);
                 Matrix layerActivationOutput = frontLayer.activate(layerWeightedOutput);
-                Matrix layerDeltas = backpropagateHelper(layerActivationOutput, expectedOutput, otherLayers...);
-                return frontLayer.backpropagate(layerDeltas);
+                // This will give us intermediateDeltas from the next layer.
+                Matrix intermediateDeltas = backpropagateHelper(learningRate, layerActivationOutput, expectedOutput, otherLayers...);
+                // Use the intermediateDeltas to calculate this layer's deltas, and then pass back other intermediate deltas.
+                return frontLayer.backpropagate(input, intermediateDeltas, layerWeightedOutput, learningRate);
             }
 
             std::tuple<Layers&...> layers;
