@@ -24,10 +24,10 @@ namespace ai {
         RELU,
     };
 
-    template <typename T>
+    template <typename Matrix>
     class Layer {
     public:
-        virtual math::Matrix<T> feedForward(const math::Matrix<T>& input) = 0;
+        virtual Matrix feedForward(const Matrix& input) = 0;
     };
 }
 

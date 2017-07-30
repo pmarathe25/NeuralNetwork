@@ -36,34 +36,35 @@ namespace ai {
     template <typename T>
     void NeuralNetwork<T>::train(const math::Matrix<T>& input, const math::Matrix<T>& desiredOutput, T learningRate) {
         feedForward(input);
+        T scaleFactor = 1 / (double) input.numRows();
         deltas.back() = costDerivative(activationOutputs.back(), desiredOutput).hadamard(computeActivationFunctionDerivative(activationOutputs.size() - 1));
         // Debug
-        // std::cout << "\n========Output before activation========" << std::endl;
-        // (outputs.back()).display();
-        // std::cout << "\n========Activation========" << std::endl;
-        // (activationOutputs.back()).display();
-        // std::cout << "========Cost Derivative========" << std::endl;
-        // (costDerivative(activationOutputs.back(), desiredOutput)).display();
-        // std::cout << "\n========Activation Derivative========" << std::endl;
-        // (computeActivationFunctionDerivative(activationOutputs.size() - 1)).display();
-        // std::cout << std::endl;
-        // std::cout << "\n========Deltas========" << std::endl;
-        // deltas.back().display();
+        std::cout << "\n========Output before activation========" << std::endl;
+        (outputs.back()).display();
+        std::cout << "\n========Activation========" << std::endl;
+        (activationOutputs.back()).display();
+        std::cout << "========Cost Derivative========" << std::endl;
+        (costDerivative(activationOutputs.back(), desiredOutput)).display();
+        std::cout << "\n========Activation Derivative========" << std::endl;
+        (computeActivationFunctionDerivative(activationOutputs.size() - 1)).display();
+        std::cout << std::endl;
+        std::cout << "\n========Deltas========" << std::endl;
+        deltas.back().display();
         // End Debug
         for (int i = deltas.size() - 2; i >= 0; --i) {
-            // Debug
-            // std::cout << "Layer " << i + 1 << std::endl;
-            // std::cout << "========Weights========" << std::endl;
-            // (weights[i + 1]).display();
-            // std::cout << "\n========Deltas========" << std::endl;
-            // (deltas[i + 1].transpose()).display();
-            // std::cout << "\n========Weights * (Deltas Transpose) Transpose========" << std::endl;
-            // ((weights[i + 1] * deltas[i + 1].transpose()).transpose()).display();
-            // std::cout << "\n========Output After Activation Derivative========" << std::endl;
-            // (computeActivationFunctionDerivative(i + 1)).display();
-            // std::cout << std::endl;
-            // End Debug
             deltas[i] = (deltas[i + 1] * weights[i + 1].transpose()).hadamard(computeActivationFunctionDerivative(i + 1));
+            // Debug
+            std::cout << "Layer " << i + 1 << std::endl;
+            std::cout << "========Weights Transpose========" << std::endl;
+            weights[i + 1].transpose().display();
+            std::cout << "\n========Deltas========" << std::endl;
+            deltas[i + 1].display();
+            std::cout << "\n========Weights Transpose * Deltas========" << std::endl;
+            (deltas[i + 1] * weights[i + 1].transpose()).display();
+            std::cout << "\n========Output After Activation Derivative========" << std::endl;
+            (computeActivationFunctionDerivative(i + 1)).display();
+            std::cout << std::endl;
+            // End Debug
         }
         // Gradients for each layers.
         std::vector<math::Matrix<T> > weightDeltas;
@@ -73,17 +74,16 @@ namespace ai {
             // Debug
             // std::cout << "Layer " << i + 1 << std::endl;
             // std::cout << "========Outputs transpose========" << std::endl;
-            // (activationOutputs[i].transpose()).display();
+            // (activationOutputs[i + 1].transpose()).display();
             // std::cout << "\n========Deltas========" << std::endl;
             // (deltas[i]).display();
             // End Debug
             // Get average weight deltas instead of the sum so learning rate is not affected.
-            T scaleFactor = 1 / (double) input.numRows();
-            weightDeltas.push_back((activationOutputs[i].transpose() * deltas[i]) * scaleFactor);
+            weightDeltas.push_back((activationOutputs[i + 1].transpose() * deltas[i]) * scaleFactor);
             biasDeltas.push_back(deltas[i].rowMean());
             // Debug
             // std::cout << "\n========Kronecker========" << std::endl;
-            // (activationOutputs[i].transpose() * deltas[i] * scaleFactor).display();
+            // (activationOutputs[i + 1].transpose() * deltas[i] * scaleFactor).display();
             // std::cout << "========Weights========" << std::endl;
             // (weights[i]).display();
             // std::cout << "========Weight Deltas========" << std::endl;
@@ -92,6 +92,16 @@ namespace ai {
             // End Debug
         }
         for (int i = 0; i < weightDeltas.size(); ++i) {
+            // Debug
+            std::cout << "========Weights " << i << " ========" << std::endl;
+            (weights[i]).display();
+            std::cout << "========Weight Deltas " << i << " ========" << std::endl;
+            weightDeltas[i].display();
+            std::cout << "========Biases " << i << " ========" << std::endl;
+            (biases[i]).display();
+            std::cout << "========Bias Deltas " << i << " ========" << std::endl;
+            biasDeltas[i].display();
+            // End Debug
             weights[i] = weights[i] - (learningRate * weightDeltas[i]);
             biases[i] = biases[i] - (learningRate * biasDeltas[i]);
         }
