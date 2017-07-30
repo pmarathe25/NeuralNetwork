@@ -5,6 +5,12 @@
 #include <random>
 #include <math.h>
 
+typedef SigmoidFCL<Matrix_F> SigmoidFCL_F;
+typedef ReLUFCL<Matrix_F> ReLUFCL_F;
+// Define a layer manager using our matrix library.
+template <typename... Layers>
+using NeuralNetwork_MSE_F = NeuralNetwork_MSE<Matrix_F, Layers...>;
+
 int main() {
     math::Matrix<float> input({{1, 1, 1}, {0.75, 0.75, 0.75}, {0.5, 0.5, 0.5}, {0.25, 0.25, 0.25}, {0, 0, 0}});
     math::Matrix<float> expectedOutput = input.applyFunction<ai::sigmoid>();
@@ -26,14 +32,14 @@ int main() {
     //
     // Test Layer functionality
     std::cout << "Testing Fully Connected Layer" << std::endl;
-    ai::SigmoidFCL testLayer(3, 3);
-    ai::ReLUFCL testLayer2(3, 3);
+    SigmoidFCL_F testLayer(3, 3);
+    ReLUFCL_F testLayer2(3, 3);
     testLayer.feedForward(input).display();
 
 
-    // ai::LayerManager<ai::SigmoidFCL, ai::ReLUFCL> layerTest(testLayer, testLayer2);
-    // ai::LayerManager<Matrix_F, ai::mse_prime<Matrix_F>, ai::SigmoidFCL, ai::ReLUFCL> layerTest(testLayer, testLayer2);
-    ai::NeuralNetwork_MSE<Matrix_F, ai::SigmoidFCL, ai::ReLUFCL> layerTest(testLayer, testLayer2);
+    // LayerManager<SigmoidFCL, ReLUFCL> layerTest(testLayer, testLayer2);
+    // LayerManager<Matrix_F, mse_prime<Matrix_F>, SigmoidFCL, ReLUFCL> layerTest(testLayer, testLayer2);
+    NeuralNetwork_MSE_F<SigmoidFCL_F, ReLUFCL_F> layerTest(testLayer, testLayer2);
     std::cout << "Testing Layer Manager feedForward" << std::endl;
     std::cout << "Expected" << std::endl;
     testLayer2.feedForward(testLayer.feedForward(input)).display();

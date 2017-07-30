@@ -86,11 +86,10 @@ namespace ai {
 
             std::tuple<Layers&...> layers;
     };
-
-    // Define some common types of neural networks here.
-    template <typename Matrix, typename... Layers>
-    using NeuralNetwork_MSE = ai::LayerManager<Matrix, ai::mse_prime<Matrix>, Layers...>;
 }
+// Define some common types of neural networks here.
+template <typename Matrix, typename... Layers>
+using NeuralNetwork_MSE = ai::LayerManager<Matrix, ai::mse_prime<Matrix>, Layers...>;
 
 
 #endif

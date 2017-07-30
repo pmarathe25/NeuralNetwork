@@ -1,7 +1,6 @@
 #ifndef FULLY_CONNECTED_LAYER_H
 #define FULLY_CONNECTED_LAYER_H
 #include "NeuralNetwork/Layer/Layer.hpp"
-#include "Matrix.hpp"
 
 namespace ai {
     template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
@@ -58,13 +57,11 @@ namespace ai {
     private:
         Matrix weights, biases;
     };
-
-    // Define some common layers.
-    template <float (*activationFunc)(float), float (*activationDeriv)(float)>
-    using FCL = FullyConnectedLayer<Matrix_F, activationFunc, activationDeriv>;
-    // Now with some common activation functions.
-    typedef FCL<ai::sigmoid, ai::sigmoid_prime> SigmoidFCL;
-    typedef FCL<ai::relu, ai::relu_prime> ReLUFCL;
 }
+// Define some common layers.
+template <typename Matrix>
+using SigmoidFCL = ai::FullyConnectedLayer<Matrix, ai::sigmoid, ai::sigmoid_prime>;
+template <typename Matrix>
+using ReLUFCL = ai::FullyConnectedLayer<Matrix, ai::relu, ai::relu_prime>;
 
 #endif
