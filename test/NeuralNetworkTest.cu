@@ -12,7 +12,7 @@ template <typename... Layers>
 using NeuralNetwork_MSE_F = NeuralNetwork_MSE<Matrix_F, Layers...>;
 
 int main() {
-    math::Matrix<float> input({10, 7.5, 5, 2.5, 0, -2.5, -7.5, -10}, 7, 1);
+    math::Matrix<float> input({1, 7.5, 5, 2.5, 0, -2.5, -7.5, -10}, 8);
     math::Matrix<float> expectedOutput = input.applyFunction<ai::sigmoid>();
 
     input.display();
