@@ -88,8 +88,8 @@ namespace ai {
     };
 
     // Define some common types of neural networks here.
-    template <typename... Layers>
-    using NeuralNetwork_MSE = ai::LayerManager<Matrix_F, ai::mse_prime<Matrix_F>, Layers...>;
+    template <typename Matrix, typename... Layers>
+    using NeuralNetwork_MSE = ai::LayerManager<Matrix, ai::mse_prime<Matrix>, Layers...>;
 }
 
 

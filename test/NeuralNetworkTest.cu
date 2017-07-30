@@ -33,7 +33,7 @@ int main() {
 
     // ai::LayerManager<ai::SigmoidFCL, ai::ReLUFCL> layerTest(testLayer, testLayer2);
     // ai::LayerManager<Matrix_F, ai::mse_prime<Matrix_F>, ai::SigmoidFCL, ai::ReLUFCL> layerTest(testLayer, testLayer2);
-    ai::NeuralNetwork_MSE<ai::SigmoidFCL, ai::ReLUFCL> layerTest(testLayer, testLayer2);
+    ai::NeuralNetwork_MSE<Matrix_F, ai::SigmoidFCL, ai::ReLUFCL> layerTest(testLayer, testLayer2);
     std::cout << "Testing Layer Manager feedForward" << std::endl;
     std::cout << "Expected" << std::endl;
     testLayer2.feedForward(testLayer.feedForward(input)).display();
