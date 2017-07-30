@@ -12,28 +12,28 @@ template <typename... Layers>
 using NeuralNetwork_MSE_F = NeuralNetwork_MSE<Matrix_F, Layers...>;
 
 int main() {
-    math::Matrix<float> input({{1, 1, 1}, {0.75, 0.75, 0.75}, {0.5, 0.5, 0.5}, {0.25, 0.25, 0.25}, {0, 0, 0}});
+    math::Matrix<float> input({1, 7.5, 5, 2.5, 0, -2.5, -10}, 7, 1);
     math::Matrix<float> expectedOutput = input.applyFunction<ai::sigmoid>();
 
-    // input.display();
-    // ai::NeuralNetwork<float> net({3, 10, 3}, ai::NeuralNetwork<float>::RELU);
-    // std::cout << "Created network." << std::endl;
-    // std::cout << "Initial Output" << std::endl;
-    // net.feedForward(input).display();
-    // // Train
-    // for (int i = 0; i < 25; ++i) {
-    //     net.train(input, expectedOutput, 0.01);
-    // }
-    // std::cout << "Actual Output" << std::endl;
-    // net.feedForward(input).display();
-    //
-    // std::cout << "Expected Output" << std::endl;
-    // expectedOutput.display();
+    input.display();
+    ai::NeuralNetwork<float> net({1, 100, 100, 1}, ai::NeuralNetwork<float>::ANALYTIC);
+    std::cout << "Created network." << std::endl;
+    std::cout << "Initial Output" << std::endl;
+    net.feedForward(input).display();
+    // Train
+    for (int i = 0; i < 2000; ++i) {
+        net.train(input, expectedOutput, 0.01);
+    }
+    std::cout << "Actual Output" << std::endl;
+    net.feedForward(input).display();
+
+    std::cout << "Expected Output" << std::endl;
+    expectedOutput.display();
     //
     // Test Layer functionality
     std::cout << "Testing Fully Connected Layer" << std::endl;
-    SigmoidFCL_F testLayer(3, 3);
-    ReLUFCL_F testLayer2(3, 3);
+    SigmoidFCL_F testLayer(1, 10);
+    ReLUFCL_F testLayer2(10, 1);
     testLayer.feedForward(input).display();
 
 
