@@ -51,8 +51,8 @@ namespace ai{
     Matrix FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::backpropagate(const Matrix& input, const Matrix& deltas, float learningRate) {
         // For the previous layer.
         Matrix intermediateDeltas = deltas * weights.transpose();
-        // Modify this layer's weights.
-        weights -= input.transpose() * deltas * learningRate / deltas.numRows();
+        // Modify this layer's weights and biases. Scale based on number of inputs.
+        weights -= input.transpose() * deltas * learningRate / (float) deltas.numRows();
         biases -= deltas.rowMean() * learningRate;
         // Return an intermediate quantity for the previous layer.
         return intermediateDeltas;

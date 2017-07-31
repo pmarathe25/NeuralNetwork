@@ -28,6 +28,16 @@ namespace ai {
         return (in < 0) ? 0 : 1;
     }
 
+    template <typename T>
+    __device__ T leakyRelu(T in) {
+        return (in < 0) ? 0.01 * in : in;
+    }
+
+    template <typename T>
+    __device__ T leakyRelu_prime(T in) {
+        return (in < 0) ? 0.01 : 1;
+    }
+
     enum activationFunction {
         SIGMOID = 0,
         ANALYTIC,
