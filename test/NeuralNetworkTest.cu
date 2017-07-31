@@ -11,14 +11,14 @@ template <typename... Layers>
 using NeuralNetwork_MSE_F = NeuralNetwork_MSE<Matrix_F, Layers...>;
 
 int main() {
-    math::Matrix<float> input({1, 7.5, 5, 2.5, 0, -2.5, -7.5, -10}, 8);
+    math::Matrix<float> input({10, 7.5, 5, 2.5, 0, -2.5, -7.5, -10}, 8);
     math::Matrix<float> expectedOutput = input.applyFunction<ai::sigmoid>();
 
     // Test Layer functionality
     SigmoidFCL_F testLayer(1, 10);
-    ReLUFCL_F testLayer2(10, 1);
+    SigmoidFCL_F testLayer2(10, 1);
 
-    NeuralNetwork_MSE_F<SigmoidFCL_F, ReLUFCL_F> layerTest(testLayer, testLayer2);
+    NeuralNetwork_MSE_F<SigmoidFCL_F, SigmoidFCL_F> layerTest(testLayer, testLayer2);
     std::cout << "Testing Layer Manager feedForward" << std::endl;
     layerTest.feedForward(input).display();
 
@@ -33,6 +33,6 @@ int main() {
     std::cout << "Expected" << std::endl;
     expectedOutput.display();
     std::cout << "Actual" << std::endl;
-    layerTest.train(input, expectedOutput, 0.01);
+    layerTest.train(input, expectedOutput, 0.001);
     layerTest.feedForward(input).display();
 }
