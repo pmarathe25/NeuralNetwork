@@ -15,10 +15,10 @@ int main() {
     math::Matrix<float> expectedOutput = input.applyFunction<ai::sigmoid>();
 
     // Test Layer functionality
-    SigmoidFCL_F testLayer(1, 10);
-    SigmoidFCL_F testLayer2(10, 1);
+    ReLUFCL_F testLayer(1, 10);
+    ReLUFCL_F testLayer2(10, 1);
 
-    NeuralNetwork_MSE_F<SigmoidFCL_F, SigmoidFCL_F> layerTest(testLayer, testLayer2);
+    NeuralNetwork_MSE_F<ReLUFCL_F, ReLUFCL_F> layerTest(testLayer, testLayer2);
     std::cout << "Testing Layer Manager feedForward" << std::endl;
     layerTest.feedForward(input).display();
 
