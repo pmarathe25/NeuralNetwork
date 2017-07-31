@@ -42,13 +42,8 @@ namespace ai{
     template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
     void FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::initializeWeights() {
         double weightRange = 2 / sqrt(weights.numRows());
-        if (activationFunc == static_cast<float (*)(float)>(relu<float>)) {
-            weights = Matrix::randomUniformLike(weights, 0, weightRange);
-            biases = Matrix::randomNormalLike(biases, 0, weightRange).template applyFunction<abs>();
-        } else {
-            weights = Matrix::randomUniformLike(weights, -weightRange, weightRange);
-            biases = Matrix::randomNormalLike(biases, 0, weightRange);
-        }
+        weights = Matrix::randomUniformLike(weights, -weightRange, weightRange);
+        biases = Matrix::randomNormalLike(biases, 0, weightRange);
     }
 
     // Processes deltas and computes a quantity for the previous layer.

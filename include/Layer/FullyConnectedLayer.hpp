@@ -26,11 +26,11 @@ namespace ai {
         }
         // Backpropagation for other layers.
         Matrix backpropagate(const Matrix& input, const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate);
-        void initializeWeights();
     private:
         Matrix weights, biases;
         // Processes deltas and computes a quantity for the previous layer.
         Matrix backpropagate(const Matrix& input, const Matrix& deltas, float learningRate);
+        void initializeWeights();
     };
 }
 // Define some common layers.
