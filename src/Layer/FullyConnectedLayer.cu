@@ -16,17 +16,17 @@ namespace ai{
     }
 
     template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
-    Matrix FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::feedForward(const Matrix& input) {
+    Matrix FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::feedForward(const Matrix& input) const {
         return activate(getWeightedOutput(input));
     }
 
     template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
-    Matrix FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::getWeightedOutput(const Matrix& input) {
+    Matrix FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::getWeightedOutput(const Matrix& input) const {
         return (input * weights).addVector(biases);
     }
 
     template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
-    Matrix FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::activate(const Matrix& weightedOutput) {
+    Matrix FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::activate(const Matrix& weightedOutput) const {
         return weightedOutput.template applyFunction<activationFunc>();
     }
 
@@ -52,10 +52,22 @@ namespace ai{
         // For the previous layer.
         Matrix intermediateDeltas = deltas * weights.transpose();
         // Modify this layer's weights.
-        weights -= input.transpose() * deltas * learningRate;
+        weights -= input.transpose() * deltas * learningRate / deltas.numRows();
+        biases -= deltas.rowMean() * learningRate;
         // Return an intermediate quantity for the previous layer.
         return intermediateDeltas;
     }
+
+    template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
+    const Matrix& FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::getWeights() const {
+        return weights;
+    }
+
+    template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
+    const Matrix& FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::getBiases() const {
+        return biases;
+    }
+
 
     template class FullyConnectedLayer<Matrix_F, ai::sigmoid, ai::sigmoid_prime>;
     template class FullyConnectedLayer<Matrix_F, ai::relu, ai::relu_prime>;

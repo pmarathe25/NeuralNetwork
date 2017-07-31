@@ -9,9 +9,9 @@ namespace ai {
         FullyConnectedLayer(int inputSize, int outputSize);
         FullyConnectedLayer(Matrix weights, Matrix biases);
         // Feeding forward.
-        Matrix feedForward(const Matrix& input);
-        Matrix getWeightedOutput(const Matrix& input);
-        Matrix activate(const Matrix& weightedOutput);
+        Matrix feedForward(const Matrix& input) const;
+        Matrix getWeightedOutput(const Matrix& input) const;
+        Matrix activate(const Matrix& weightedOutput) const;
         // Backpropagation for the last layer.
         template <Matrix (*costDeriv)(const Matrix&, const Matrix&)>
         Matrix backpropagate(const Matrix& input, const Matrix& weightedOutput,
@@ -26,6 +26,9 @@ namespace ai {
         }
         // Backpropagation for other layers.
         Matrix backpropagate(const Matrix& input, const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate);
+        // User-facing functions
+        const Matrix& getWeights() const;
+        const Matrix& getBiases() const;
     private:
         Matrix weights, biases;
         // Processes deltas and computes a quantity for the previous layer.

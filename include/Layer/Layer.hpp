@@ -37,7 +37,7 @@ namespace ai {
     template <typename Matrix>
     class Layer {
     public:
-        virtual Matrix feedForward(const Matrix& input) = 0;
+        virtual Matrix feedForward(const Matrix& input) const = 0;
     };
 }
 

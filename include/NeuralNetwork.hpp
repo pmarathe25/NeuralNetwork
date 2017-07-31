@@ -26,9 +26,7 @@ namespace ai {
     template <typename Matrix, Matrix (*costDeriv)(const Matrix&, const Matrix&), typename... Layers>
     class NeuralNetwork {
         public:
-            NeuralNetwork(Layers&... layers) : layers(layers...) {
-
-            }
+            NeuralNetwork(Layers&... layers) : layers(layers...) { }
 
             Matrix feedForward(const Matrix& input) {
                 return getLayerOutput<sizeof...(Layers)>(input);
