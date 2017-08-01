@@ -6,7 +6,9 @@ namespace ai {
     template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
     class FullyConnectedLayer : Layer<Matrix> {
     public:
+        // Default weight initialization if needed.
         FullyConnectedLayer(int inputSize, int outputSize);
+        // Custom weight initialization is much preferred.
         FullyConnectedLayer(Matrix weights, Matrix biases);
         // Feeding forward.
         Matrix feedForward(const Matrix& input) const;
