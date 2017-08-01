@@ -35,7 +35,7 @@ int main() {
     std::cout << "Expected" << std::endl;
     expectedOutput.display();
     std::cout << "Actual" << std::endl;
-    // optimizer.train(input, expectedOutput);
+    optimizer.train(input, expectedOutput);
     // layerTest.train(input, expectedOutput, 0.001);
     layerTest.feedForward(input).display();
     //
