@@ -6,29 +6,76 @@ namespace ai {
     template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
     class FullyConnectedLayer : Layer<Matrix> {
     public:
-        // Default weight initialization if needed.
-        FullyConnectedLayer(int inputSize, int outputSize);
-        // Custom weight initialization is much preferred.
-        FullyConnectedLayer(Matrix weights, Matrix biases);
-        // Feeding forward.
-        Matrix feedForward(const Matrix& input) const;
-        Matrix getWeightedOutput(const Matrix& input) const;
-        Matrix activate(const Matrix& weightedOutput) const;
+        FullyConnectedLayer(int inputSize, int outputSize) {
+            this -> weights = Matrix(inputSize, outputSize);
+            this -> biases = Matrix(1, outputSize);
+            initializeWeights();
+        }
+
+        FullyConnectedLayer(Matrix weights, Matrix biases) {
+            this -> weights = weights;
+            this -> biases = biases;
+        }
+
+        Matrix feedForward(const Matrix& input) const {
+            return activate(getWeightedOutput(input));
+        }
+
+        Matrix getWeightedOutput(const Matrix& input) const {
+            return (input * weights).addVector(biases);
+        }
+
+        Matrix activate(const Matrix& weightedOutput) const {
+            return weightedOutput.template applyFunction<activationFunc>();
+        }
+
         // Backpropagation for other layers.
-        Matrix computeDeltas(const Matrix& input, const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate) const;
-        Matrix backpropagate(const Matrix& input, const Matrix& deltas, float learningRate);
-        // Training functions.
-        Matrix computeWeightDeltas(const Matrix& input, const Matrix& deltas, float learningRate) const;
-        Matrix computeBiasDeltas(const Matrix& deltas, float learningRate) const;
-        // User-facing functions
-        const Matrix& getWeights() const;
-        const Matrix& getBiases() const;
+        Matrix computeDeltas(const Matrix& input,
+            const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate) const {
+            // Compute this layer's deltas
+            return intermediateDeltas.hadamard(weightedOutput.template applyFunction<activationDeriv>());
+        }
+
+        // Processes deltas and computes a quantity for the previous layer.
+        Matrix backpropagate(const Matrix& input,
+            const Matrix& deltas, float learningRate) {
+            // For the previous layer.
+            Matrix intermediateDeltas = deltas * weights.transpose();
+            // Modify this layer's weights and biases. Scale based on number of inputs.
+            weights -= computeWeightDeltas(input, deltas, learningRate);
+            biases -= computeBiasDeltas(deltas, learningRate);
+            // Return an intermediate quantity for the previous layer.
+            return intermediateDeltas;
+        }
+
+        Matrix computeWeightDeltas(const Matrix& input,
+            const Matrix& deltas, float learningRate) const {
+            return input.transpose() * deltas * learningRate / (float) deltas.numRows();
+        }
+
+        Matrix computeBiasDeltas(const Matrix& deltas, float learningRate) const {
+            return deltas.rowMean() * learningRate;
+        }
+
+        const Matrix& getWeights() const {
+            return weights;
+        }
+
+        const Matrix& getBiases() const {
+            return biases;
+        }
+
     private:
         Matrix weights, biases;
         // Processes deltas and computes a quantity for the previous layer.
-        void initializeWeights();
+        void initializeWeights() {
+            double weightRange = 2 / sqrt(weights.numRows());
+            weights = Matrix::randomUniformLike(weights, -weightRange, weightRange);
+            biases = Matrix::randomNormalLike(biases, 0, weightRange);
+        }
     };
 } /* namespace ai */
+
 // Define some common layers.
 template <typename Matrix>
 using SigmoidFCL = ai::FullyConnectedLayer<Matrix, ai::sigmoid, ai::sigmoid_prime>;
