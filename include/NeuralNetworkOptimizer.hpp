@@ -40,7 +40,7 @@ namespace ai {
                 // Compute cost derivative.
                 Matrix intermediateDeltas = costDeriv(layerActivationOutput, expectedOutput);
                 // Now compute deltas
-                Matrix deltas = backLayer.computeDeltas(input, intermediateDeltas, layerWeightedOutput, learningRate);
+                Matrix deltas = backLayer.computeDeltas(intermediateDeltas, layerWeightedOutput);
                 // This will return intermediate deltas for the layer before this one.
                 Matrix previousIntermediateDeltas = backLayer.backpropagate(deltas);
                 // Adjust weights + biases AFTER computing deltas for the previous layer, so our new weights don't affect the current training iteration.
@@ -56,7 +56,7 @@ namespace ai {
                 // This will give us intermediateDeltas from the next layer.
                 Matrix intermediateDeltas = backpropagateHelper(learningRate, layerActivationOutput, expectedOutput, otherLayers...);
                 // Use the intermediateDeltas to calculate this layer's deltas.
-                Matrix deltas = frontLayer.computeDeltas(input, intermediateDeltas, layerWeightedOutput, learningRate);
+                Matrix deltas = frontLayer.computeDeltas(intermediateDeltas, layerWeightedOutput);
                 // Now compute intermediate deltas for the layer before this one.
                 Matrix previousIntermediateDeltas = frontLayer.backpropagate(deltas);
                 // Adjust weights + biases AFTER computing deltas for the previous layer, so our new weights don't affect the current training iteration.

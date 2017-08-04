@@ -29,7 +29,7 @@ namespace ai {
             return weightedOutput.template applyFunction<activationFunc>();
         }
 
-        Matrix computeDeltas(const Matrix& input, const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate) const {
+        Matrix computeDeltas(const Matrix& intermediateDeltas, const Matrix& weightedOutput) const {
             // Compute this layer's deltas
             return intermediateDeltas.hadamard(weightedOutput.template applyFunction<activationDeriv>());
         }
