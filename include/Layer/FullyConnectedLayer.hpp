@@ -34,9 +34,7 @@ namespace ai {
             return intermediateDeltas.hadamard(weightedOutput.template applyFunction<activationDeriv>());
         }
 
-        // Processes deltas and computes a quantity for the previous layer.
         Matrix backpropagate(const Matrix& deltas) {
-            // For the previous layer.
             return deltas * weights.transpose();
         }
 
