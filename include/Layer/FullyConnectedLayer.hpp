@@ -17,6 +17,16 @@ namespace ai {
             this -> biases = biases;
         }
 
+        void write(std::ofstream& saveFile) const {
+            weights.write(saveFile);
+            biases.write(saveFile);
+        }
+
+        void read(std::ifstream& saveFile) {
+            weights.read(saveFile);
+            biases.read(saveFile);
+        }
+
         Matrix feedForward(const Matrix& input) const {
             return activate(getWeightedOutput(input));
         }

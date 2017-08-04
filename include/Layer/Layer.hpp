@@ -1,5 +1,6 @@
 #ifndef LAYER_H
 #define LAYER_H
+#include <fstream>
 
 namespace ai {
     template <typename T>
@@ -47,7 +48,13 @@ namespace ai {
     template <typename Matrix>
     class Layer {
     public:
+        virtual void write(std::ofstream& saveFile) const = 0;
+        virtual void read(std::ifstream& saveFile) = 0;
         virtual Matrix feedForward(const Matrix& input) const = 0;
+        virtual Matrix getWeightedOutput(const Matrix& input) const = 0;
+        virtual Matrix activate(const Matrix& weightedOutput) const = 0;
+        virtual Matrix computeDeltas(const Matrix& intermediateDeltas, const Matrix& weightedOutput) const = 0;
+        virtual Matrix backpropagate(const Matrix& deltas) = 0;
     };
 } /* namespace ai */
 
