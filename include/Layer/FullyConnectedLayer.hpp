@@ -54,7 +54,7 @@ namespace ai {
 
     private:
         Matrix weights, biases;
-        // Processes deltas and computes a quantity for the previous layer.
+        // Default weight initialization. Not incredibly robust.
         void initializeWeights() {
             double weightRange = 2 / sqrt(weights.numRows());
             weights = Matrix::randomUniformLike(weights, -weightRange, weightRange);
