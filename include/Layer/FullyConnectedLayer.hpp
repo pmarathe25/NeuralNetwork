@@ -29,32 +29,20 @@ namespace ai {
             return weightedOutput.template applyFunction<activationFunc>();
         }
 
-        // Backpropagation for other layers.
-        Matrix computeDeltas(const Matrix& input,
-            const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate) const {
+        Matrix computeDeltas(const Matrix& input, const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate) const {
             // Compute this layer's deltas
             return intermediateDeltas.hadamard(weightedOutput.template applyFunction<activationDeriv>());
         }
 
         // Processes deltas and computes a quantity for the previous layer.
-        Matrix backpropagate(const Matrix& input,
-            const Matrix& deltas, float learningRate) {
+        Matrix backpropagate(const Matrix& deltas) {
             // For the previous layer.
-            Matrix intermediateDeltas = deltas * weights.transpose();
-            // Modify this layer's weights and biases. Scale based on number of inputs.
-            weights -= computeWeightDeltas(input, deltas, learningRate);
-            biases -= computeBiasDeltas(deltas, learningRate);
-            // Return an intermediate quantity for the previous layer.
-            return intermediateDeltas;
+            return deltas * weights.transpose();
         }
 
-        Matrix computeWeightDeltas(const Matrix& input,
-            const Matrix& deltas, float learningRate) const {
-            return input.transpose() * deltas * learningRate / (float) deltas.numRows();
-        }
-
-        Matrix computeBiasDeltas(const Matrix& deltas, float learningRate) const {
-            return deltas.rowMean() * learningRate;
+        void sgd(const Matrix& input, const Matrix& deltas, float learningRate) {
+            weights -= input.transpose() * deltas * learningRate / (float) deltas.numRows();
+            biases -= deltas.rowMean() * learningRate;
         }
 
         const Matrix& getWeights() const {

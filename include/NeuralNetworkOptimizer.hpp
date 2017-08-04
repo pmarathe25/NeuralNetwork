@@ -42,7 +42,9 @@ namespace ai {
                 // Now compute deltas
                 Matrix deltas = backLayer.computeDeltas(input, intermediateDeltas, layerWeightedOutput, learningRate);
                 // This will return intermediate deltas for the layer before this one.
-                Matrix previousIntermediateDeltas = backLayer.backpropagate(input, deltas, learningRate);
+                Matrix previousIntermediateDeltas = backLayer.backpropagate(deltas);
+                // Adjust weights + biases AFTER computing deltas for the previous layer, so our new weights don't affect the current training iteration.
+                backLayer.sgd(input, deltas, learningRate);
                 return previousIntermediateDeltas;
             }
 
@@ -56,7 +58,9 @@ namespace ai {
                 // Use the intermediateDeltas to calculate this layer's deltas.
                 Matrix deltas = frontLayer.computeDeltas(input, intermediateDeltas, layerWeightedOutput, learningRate);
                 // Now compute intermediate deltas for the layer before this one.
-                Matrix previousIntermediateDeltas = frontLayer.backpropagate(input, deltas, learningRate);
+                Matrix previousIntermediateDeltas = frontLayer.backpropagate(deltas);
+                // Adjust weights + biases AFTER computing deltas for the previous layer, so our new weights don't affect the current training iteration.
+                frontLayer.sgd(input, deltas, learningRate);
                 return previousIntermediateDeltas;
             }
 
