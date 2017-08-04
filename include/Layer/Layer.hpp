@@ -10,7 +10,7 @@ namespace ai {
     template <typename T>
     __device__ T sigmoid_prime(T in) {
         T sig = sigmoid(in);
-        return sig * (1- sig);
+        return sig * (1 - sig);
     }
 
     template <typename T>

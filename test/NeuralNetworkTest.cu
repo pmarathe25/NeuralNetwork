@@ -7,6 +7,7 @@
 
 typedef SigmoidFCL<Matrix_F> SigmoidFCL_F;
 typedef ReLUFCL<Matrix_F> ReLUFCL_F;
+typedef LeakyReLUFCL<Matrix_F> LeakyReLUFCL_F;
 template <typename... Layers>
 using NeuralNetwork = ai::NeuralNetwork<Matrix_F, Layers...>;
 
@@ -16,11 +17,11 @@ int main() {
 
     // Test Layer functionality
     SigmoidFCL_F testLayer1(1, 10);
-    ReLUFCL_F testLayer2(10, 1);
+    LeakyReLUFCL_F testLayer2(10, 1);
 
-    NeuralNetwork<SigmoidFCL_F, ReLUFCL_F> layerTest(testLayer1, testLayer2);
+    NeuralNetwork<SigmoidFCL_F, LeakyReLUFCL_F> layerTest(testLayer1, testLayer2);
     // Let's create an optimizer!
-    ai::NeuralNetworkOptimizer<Matrix_F, ai::mse_prime<Matrix_F>, SigmoidFCL_F, ReLUFCL_F> optimizer(layerTest);
+    ai::NeuralNetworkOptimizer<Matrix_F, ai::mse_prime<Matrix_F>, SigmoidFCL_F, LeakyReLUFCL_F> optimizer(layerTest);
     std::cout << "Testing Layer Manager feedForward" << std::endl;
     layerTest.feedForward(input).display();
 

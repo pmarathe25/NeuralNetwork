@@ -71,5 +71,6 @@ namespace ai{
 
     template class FullyConnectedLayer<Matrix_F, ai::sigmoid, ai::sigmoid_prime>;
     template class FullyConnectedLayer<Matrix_F, ai::relu, ai::relu_prime>;
+    template class FullyConnectedLayer<Matrix_F, ai::leakyRelu, ai::leakyRelu_prime>;
 
 } /* namespace ai */

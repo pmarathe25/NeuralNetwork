@@ -22,7 +22,7 @@ $(TESTDIR)/NeuralNetworkTest: $(TESTOBJS) $(LIBS)
 	$(CXX) $(TESTLFLAGS) $(TESTOBJS) $(LIBS) -o $(TESTDIR)/NeuralNetworkTest
 
 $(BUILDDIR)/NeuralNetworkTest.o: $(TESTDIR)/NeuralNetworkTest.cu include/NeuralNetwork.hpp \
-	include/Layer/Layer.hpp include/Layer/FullyConnectedLayer.hpp
+	include/NeuralNetworkOptimizer.hpp include/Layer/Layer.hpp include/Layer/FullyConnectedLayer.hpp
 	$(CXX) $(CFLAGS) $(TESTDIR)/NeuralNetworkTest.cu -o $(BUILDDIR)/NeuralNetworkTest.o
 
 $(BUILDDIR)/FullyConnectedLayer.o: include/Layer/FullyConnectedLayer.hpp $(SRCDIR)/Layer/FullyConnectedLayer.cu

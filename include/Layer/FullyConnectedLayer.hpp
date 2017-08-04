@@ -14,27 +14,15 @@ namespace ai {
         Matrix feedForward(const Matrix& input) const;
         Matrix getWeightedOutput(const Matrix& input) const;
         Matrix activate(const Matrix& weightedOutput) const;
-        // Backpropagation for the last layer.
-        template <Matrix (*costDeriv)(const Matrix&, const Matrix&)>
-        Matrix backpropagate(const Matrix& input, const Matrix& weightedOutput,
-            const Matrix& activationOutput, const Matrix& expectedOutput, float learningRate) {
-            // z: Weighted outputs of the layer.
-            // σ: Activated outputs of the layer.
-            // C: The cost function.
-            // In order to compute the cost derivative with repect to the weighted inputs, compute (dC / dz) as (dC / dσ) * (dσ / dz)
-            Matrix deltas = costDeriv(activationOutput, expectedOutput).hadamard(weightedOutput.template applyFunction<activationDeriv>());
-            // Use these deltas and then compute an intermediate quantity for the previous layer.
-            return backpropagate(input, deltas, learningRate);
-        }
         // Backpropagation for other layers.
         Matrix backpropagate(const Matrix& input, const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate);
+        Matrix backpropagate(const Matrix& input, const Matrix& deltas, float learningRate);
         // User-facing functions
         const Matrix& getWeights() const;
         const Matrix& getBiases() const;
     private:
         Matrix weights, biases;
         // Processes deltas and computes a quantity for the previous layer.
-        Matrix backpropagate(const Matrix& input, const Matrix& deltas, float learningRate);
         void initializeWeights();
     };
 }
@@ -43,5 +31,7 @@ template <typename Matrix>
 using SigmoidFCL = ai::FullyConnectedLayer<Matrix, ai::sigmoid, ai::sigmoid_prime>;
 template <typename Matrix>
 using ReLUFCL = ai::FullyConnectedLayer<Matrix, ai::relu, ai::relu_prime>;
+template <typename Matrix>
+using LeakyReLUFCL = ai::FullyConnectedLayer<Matrix, ai::leakyRelu, ai::leakyRelu_prime>;
 
 #endif

@@ -35,10 +35,12 @@ namespace ai {
             // Backpropagation base case.
             template <typename BackLayer>
             inline Matrix backpropagateHelper(float learningRate, const Matrix& input, const Matrix& expectedOutput, BackLayer& backLayer) {
-                Matrix weightedOutput = backLayer.getWeightedOutput(input);
-                Matrix activationOutput = backLayer.activate(weightedOutput);
+                Matrix layerWeightedOutput = backLayer.getWeightedOutput(input);
+                Matrix layerActivationOutput = backLayer.activate(layerWeightedOutput);
+                // Compute cost derivative.
+                Matrix intermediateDeltas = costDeriv(layerActivationOutput, expectedOutput);
                 // This will return intermediate deltas for the layer just before.
-                return backLayer.template backpropagate<costDeriv>(input, weightedOutput, activationOutput, expectedOutput, learningRate);
+                return backLayer.backpropagate(input, intermediateDeltas, layerWeightedOutput, learningRate);
             }
 
             // Backpropagation recursion.
