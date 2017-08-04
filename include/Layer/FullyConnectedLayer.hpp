@@ -15,10 +15,16 @@ namespace ai {
         Matrix getWeightedOutput(const Matrix& input) const;
         Matrix activate(const Matrix& weightedOutput) const;
         // Backpropagation for other layers.
-        Matrix computeDeltas(const Matrix& input, const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate);
+        Matrix computeDeltas(const Matrix& input, const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate) const;
         Matrix backpropagate(const Matrix& input, const Matrix& deltas, float learningRate);
-        Matrix weights, biases;
+        // Training functions.
+        Matrix computeWeightDeltas(const Matrix& input, const Matrix& deltas, float learningRate) const;
+        Matrix computeBiasDeltas(const Matrix& deltas, float learningRate) const;
+        // User-facing functions
+        const Matrix& getWeights() const;
+        const Matrix& getBiases() const;
     private:
+        Matrix weights, biases;
         // Processes deltas and computes a quantity for the previous layer.
         void initializeWeights();
     };

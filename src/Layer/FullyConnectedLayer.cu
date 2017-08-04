@@ -32,23 +32,44 @@ namespace ai{
 
     // Backpropagation for other layers.
     template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
-    Matrix FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::computeDeltas(const Matrix& input, const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate) {
+    Matrix FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::computeDeltas(const Matrix& input,
+        const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate) const {
         // Compute this layer's deltas
-        Matrix deltas = intermediateDeltas.hadamard(weightedOutput.template applyFunction<activationDeriv>());
-        // Use these deltas and then compute an intermediate quantity for the previous layer.
-        return deltas;
+        return intermediateDeltas.hadamard(weightedOutput.template applyFunction<activationDeriv>());
     }
 
     // Processes deltas and computes a quantity for the previous layer.
     template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
-    Matrix FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::backpropagate(const Matrix& input, const Matrix& deltas, float learningRate) {
+    Matrix FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::backpropagate(const Matrix& input,
+        const Matrix& deltas, float learningRate) {
         // For the previous layer.
         Matrix intermediateDeltas = deltas * weights.transpose();
         // Modify this layer's weights and biases. Scale based on number of inputs.
-        weights -= input.transpose() * deltas * learningRate / (float) deltas.numRows();
-        biases -= deltas.rowMean() * learningRate;
+        weights -= computeWeightDeltas(input, deltas, learningRate);
+        biases -= computeBiasDeltas(deltas, learningRate);
         // Return an intermediate quantity for the previous layer.
         return intermediateDeltas;
+    }
+
+    template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
+    Matrix FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::computeWeightDeltas(const Matrix& input,
+        const Matrix& deltas, float learningRate) const {
+        return input.transpose() * deltas * learningRate / (float) deltas.numRows();
+    }
+
+    template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
+    Matrix FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::computeBiasDeltas(const Matrix& deltas, float learningRate) const {
+        return deltas.rowMean() * learningRate;
+    }
+
+    template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
+    const Matrix& FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::getWeights() const {
+        return weights;
+    }
+
+    template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
+    const Matrix& FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::getBiases() const {
+        return biases;
     }
 
     template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>

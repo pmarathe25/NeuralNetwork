@@ -8,7 +8,7 @@ typedef ReLUFCL<Matrix_F> ReLUFCL_F;
 typedef LeakyReLUFCL<Matrix_F> LeakyReLUFCL_F;
 // Define a network using a custom matrix class.
 template <typename... Layers>
-using NeuralNetwork = ai::NeuralNetwork<Matrix_F, Layers...>;
+using NeuralNetwork_F = ai::NeuralNetwork<Matrix_F, Layers...>;
 
 int main() {
     Matrix_F input({10, 7.5, 5, 2.5, 0, -2.5, -7.5, -10}, 8);
@@ -18,7 +18,7 @@ int main() {
     SigmoidFCL_F testLayer1(1, 100);
     ReLUFCL_F testLayer2(100, 1);
 
-    NeuralNetwork<SigmoidFCL_F, ReLUFCL_F> layerTest(testLayer1, testLayer2);
+    NeuralNetwork_F<SigmoidFCL_F, ReLUFCL_F> layerTest(testLayer1, testLayer2);
     // Let's create an optimizer!
     ai::NeuralNetworkOptimizer<Matrix_F, ai::mse_prime<Matrix_F>, SigmoidFCL_F, ReLUFCL_F> optimizer(layerTest);
     std::cout << "Testing Layer Manager feedForward" << std::endl;
@@ -44,17 +44,17 @@ int main() {
     // std::cout << "Testing perfect sigmoid network before training" << std::endl;
     // sigmoidNetwork.feedForward(input).display();
     // std::cout << "Weights" << std::endl;
-    // perfectSigmoid.weights.display();
+    // perfectSigmoid.getWeights().display();
     // std::cout << "Biases" << std::endl;
-    // perfectSigmoid.biases.display();
+    // perfectSigmoid.getBiases().display();
     // std::cout << "Expected" << std::endl;
     // expectedOutput.display();
     // std::cout << "Actual (after training)" << std::endl;
     // sigmoidNetwork.train(input, expectedOutput);
     // sigmoidNetwork.feedForward(input).display();
     // std::cout << "Weights" << std::endl;
-    // perfectSigmoid.weights.display();
+    // perfectSigmoid.getWeights().display();
     // std::cout << "Biases" << std::endl;
-    // perfectSigmoid.biases.display();
+    // perfectSigmoid.getBiases().display();
 
 }
