@@ -40,7 +40,8 @@ namespace ai {
                 // Compute cost derivative.
                 Matrix intermediateDeltas = costDeriv(layerActivationOutput, expectedOutput);
                 // This will return intermediate deltas for the layer just before.
-                return backLayer.backpropagate(input, intermediateDeltas, layerWeightedOutput, learningRate);
+                Matrix deltas = backLayer.computeDeltas(input, intermediateDeltas, layerWeightedOutput, learningRate);
+                return backLayer.backpropagate(input, deltas, learningRate);
             }
 
             // Backpropagation recursion.
@@ -51,7 +52,8 @@ namespace ai {
                 // This will give us intermediateDeltas from the next layer.
                 Matrix intermediateDeltas = backpropagateHelper(learningRate, layerActivationOutput, expectedOutput, otherLayers...);
                 // Use the intermediateDeltas to calculate this layer's deltas, and then pass back other intermediate deltas.
-                return frontLayer.backpropagate(input, intermediateDeltas, layerWeightedOutput, learningRate);
+                Matrix deltas = frontLayer.computeDeltas(input, intermediateDeltas, layerWeightedOutput, learningRate);
+                return frontLayer.backpropagate(input, deltas, learningRate);
             }
 
             std::tuple<Layers&...> layers;

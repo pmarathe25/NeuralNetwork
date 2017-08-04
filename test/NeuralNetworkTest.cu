@@ -2,12 +2,11 @@
 #include "Layer/FullyConnectedLayer.hpp"
 #include "NeuralNetwork.hpp"
 #include "NeuralNetworkOptimizer.hpp"
-// #include <random>
-// #include <math.h>
 
 typedef SigmoidFCL<Matrix_F> SigmoidFCL_F;
 typedef ReLUFCL<Matrix_F> ReLUFCL_F;
 typedef LeakyReLUFCL<Matrix_F> LeakyReLUFCL_F;
+// Define a network using a custom matrix class.
 template <typename... Layers>
 using NeuralNetwork = ai::NeuralNetwork<Matrix_F, Layers...>;
 
@@ -16,12 +15,12 @@ int main() {
     Matrix_F expectedOutput = input.applyFunction<ai::sigmoid>();
 
     // Test Layer functionality
-    SigmoidFCL_F testLayer1(1, 10);
-    LeakyReLUFCL_F testLayer2(10, 1);
+    SigmoidFCL_F testLayer1(1, 100);
+    ReLUFCL_F testLayer2(100, 1);
 
-    NeuralNetwork<SigmoidFCL_F, LeakyReLUFCL_F> layerTest(testLayer1, testLayer2);
+    NeuralNetwork<SigmoidFCL_F, ReLUFCL_F> layerTest(testLayer1, testLayer2);
     // Let's create an optimizer!
-    ai::NeuralNetworkOptimizer<Matrix_F, ai::mse_prime<Matrix_F>, SigmoidFCL_F, LeakyReLUFCL_F> optimizer(layerTest);
+    ai::NeuralNetworkOptimizer<Matrix_F, ai::mse_prime<Matrix_F>, SigmoidFCL_F, ReLUFCL_F> optimizer(layerTest);
     std::cout << "Testing Layer Manager feedForward" << std::endl;
     layerTest.feedForward(input).display();
 
@@ -36,7 +35,7 @@ int main() {
     std::cout << "Expected" << std::endl;
     expectedOutput.display();
     std::cout << "Actual" << std::endl;
-    optimizer.train(input, expectedOutput);
+    optimizer.train(input, expectedOutput, 0.005);
     // layerTest.train(input, expectedOutput, 0.001);
     layerTest.feedForward(input).display();
     //
@@ -45,17 +44,17 @@ int main() {
     // std::cout << "Testing perfect sigmoid network before training" << std::endl;
     // sigmoidNetwork.feedForward(input).display();
     // std::cout << "Weights" << std::endl;
-    // perfectSigmoid.getWeights().display();
+    // perfectSigmoid.weights.display();
     // std::cout << "Biases" << std::endl;
-    // perfectSigmoid.getBiases().display();
+    // perfectSigmoid.biases.display();
     // std::cout << "Expected" << std::endl;
     // expectedOutput.display();
     // std::cout << "Actual (after training)" << std::endl;
     // sigmoidNetwork.train(input, expectedOutput);
     // sigmoidNetwork.feedForward(input).display();
     // std::cout << "Weights" << std::endl;
-    // perfectSigmoid.getWeights().display();
+    // perfectSigmoid.weights.display();
     // std::cout << "Biases" << std::endl;
-    // perfectSigmoid.getBiases().display();
+    // perfectSigmoid.biases.display();
 
 }

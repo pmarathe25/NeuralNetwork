@@ -49,6 +49,6 @@ namespace ai {
     public:
         virtual Matrix feedForward(const Matrix& input) const = 0;
     };
-}
+} /* namespace ai */
 
 #endif

@@ -15,17 +15,14 @@ namespace ai {
         Matrix getWeightedOutput(const Matrix& input) const;
         Matrix activate(const Matrix& weightedOutput) const;
         // Backpropagation for other layers.
-        Matrix backpropagate(const Matrix& input, const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate);
+        Matrix computeDeltas(const Matrix& input, const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate);
         Matrix backpropagate(const Matrix& input, const Matrix& deltas, float learningRate);
-        // User-facing functions
-        const Matrix& getWeights() const;
-        const Matrix& getBiases() const;
-    private:
         Matrix weights, biases;
+    private:
         // Processes deltas and computes a quantity for the previous layer.
         void initializeWeights();
     };
-}
+} /* namespace ai */
 // Define some common layers.
 template <typename Matrix>
 using SigmoidFCL = ai::FullyConnectedLayer<Matrix, ai::sigmoid, ai::sigmoid_prime>;

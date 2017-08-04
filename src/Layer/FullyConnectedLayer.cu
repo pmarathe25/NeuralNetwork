@@ -32,18 +32,11 @@ namespace ai{
 
     // Backpropagation for other layers.
     template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
-    Matrix FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::backpropagate(const Matrix& input, const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate) {
+    Matrix FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::computeDeltas(const Matrix& input, const Matrix& intermediateDeltas, const Matrix& weightedOutput, float learningRate) {
         // Compute this layer's deltas
         Matrix deltas = intermediateDeltas.hadamard(weightedOutput.template applyFunction<activationDeriv>());
         // Use these deltas and then compute an intermediate quantity for the previous layer.
-        return backpropagate(input, deltas, learningRate);
-    }
-
-    template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
-    void FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::initializeWeights() {
-        double weightRange = 2 / sqrt(weights.numRows());
-        weights = Matrix::randomUniformLike(weights, -weightRange, weightRange);
-        biases = Matrix::randomNormalLike(biases, 0, weightRange);
+        return deltas;
     }
 
     // Processes deltas and computes a quantity for the previous layer.
@@ -59,15 +52,11 @@ namespace ai{
     }
 
     template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
-    const Matrix& FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::getWeights() const {
-        return weights;
+    void FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::initializeWeights() {
+        double weightRange = 2 / sqrt(weights.numRows());
+        weights = Matrix::randomUniformLike(weights, -weightRange, weightRange);
+        biases = Matrix::randomNormalLike(biases, 0, weightRange);
     }
-
-    template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
-    const Matrix& FullyConnectedLayer<Matrix, activationFunc, activationDeriv>::getBiases() const {
-        return biases;
-    }
-
 
     template class FullyConnectedLayer<Matrix_F, ai::sigmoid, ai::sigmoid_prime>;
     template class FullyConnectedLayer<Matrix_F, ai::relu, ai::relu_prime>;
