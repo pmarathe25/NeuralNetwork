@@ -21,7 +21,9 @@ namespace ai {
     template <typename Matrix, typename... Layers>
     class NeuralNetwork {
         public:
-            NeuralNetwork(Layers&... layers) : layers(layers...) { }
+            NeuralNetwork() { }
+
+            NeuralNetwork(Layers... layers) : layers(layers...) { }
 
             Matrix feedForward(const Matrix& input) {
                 return getLayerOutput<sizeof...(Layers)>(input);
@@ -29,36 +31,44 @@ namespace ai {
 
             template <int layerNum = 1>
             Matrix getLayerOutput(const Matrix& input) {
-                return feedForwardHelper(input, typename sequenceGenerator<layerNum>::type());
+                return feedForwardUnpacker(input, typename sequenceGenerator<layerNum>::type());
             }
 
-            const std::tuple<Layers&...>& getLayers() const {
-                return layers;
+            // Return a tuple of const references to layers.
+            const std::tuple<Layers&...> getLayers() const {
+                return getLayersUnpacker(typename sequenceGenerator<sizeof...(Layers)>::type());
             }
 
-            std::tuple<Layers&...>& getLayers() {
-                return layers;
+            // Return a tuple of non-const references to layers.
+            std::tuple<Layers&...> getLayers() {
+                return getLayersUnpacker(typename sequenceGenerator<sizeof...(Layers)>::type());
             }
+
         private:
             // Feed forward unpacker.
             template <int... S>
-            inline Matrix feedForwardHelper(const Matrix& input, sequence<S...>) {
-                return feedForwardHelper(input, std::get<S>(layers)...);
+            inline Matrix feedForwardUnpacker(const Matrix& input, sequence<S...>) {
+                return feedForwardRecursive(input, std::get<S>(layers)...);
             }
 
             // Feed forward base case.
             template <typename BackLayer>
-            inline Matrix feedForwardHelper(const Matrix& input, BackLayer& backLayer) {
+            inline Matrix feedForwardBaseCase(const Matrix& input, BackLayer& backLayer) {
                 return backLayer.feedForward(input);
             }
 
             // Feed forward recursion.
             template <typename FrontLayer, typename... BackLayers>
-            inline Matrix feedForwardHelper(const Matrix& input, FrontLayer& frontLayer, BackLayers&... otherLayers) {
-                return feedForwardHelper(frontLayer.feedForward(input), otherLayers...);
+            inline Matrix feedForwardRecursive(const Matrix& input, FrontLayer& frontLayer, BackLayers&... otherLayers) {
+                return feedForwardBaseCase(frontLayer.feedForward(input), otherLayers...);
             }
 
-            std::tuple<Layers&...> layers;
+            template <int... S>
+            std::tuple<Layers&...> getLayersUnpacker(sequence<S...>) {
+                return std::forward_as_tuple(std::get<S>(layers)...);
+            }
+
+            std::tuple<Layers...> layers;
     };
 }
 

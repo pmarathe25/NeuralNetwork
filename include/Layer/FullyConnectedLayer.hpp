@@ -6,6 +6,8 @@ namespace ai {
     template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
     class FullyConnectedLayer : Layer<Matrix> {
     public:
+        FullyConnectedLayer() { }
+
         FullyConnectedLayer(int inputSize, int outputSize) {
             this -> weights = Matrix(inputSize, outputSize);
             this -> biases = Matrix(1, outputSize);
@@ -17,14 +19,14 @@ namespace ai {
             this -> biases = biases;
         }
 
-        void write(std::ofstream& saveFile) const {
-            weights.write(saveFile);
-            biases.write(saveFile);
+        void save(std::ofstream& saveFile) const {
+            weights.save(saveFile);
+            biases.save(saveFile);
         }
 
-        void read(std::ifstream& saveFile) {
-            weights.read(saveFile);
-            biases.read(saveFile);
+        void load(std::ifstream& saveFile) {
+            weights = Matrix::load(saveFile);
+            biases = Matrix::load(saveFile);
         }
 
         Matrix feedForward(const Matrix& input) const {

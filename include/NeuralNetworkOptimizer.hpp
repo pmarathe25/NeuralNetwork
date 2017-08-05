@@ -14,7 +14,7 @@ namespace ai {
             NeuralNetworkOptimizer(NeuralNetwork<Matrix, Layers...>& target) : layers(target.getLayers()) { }
 
             Matrix backpropagate(const Matrix& input, const Matrix& expectedOutput, float learningRate = 0.001) {
-                return backpropagateHelper(learningRate, input, expectedOutput, typename sequenceGenerator<sizeof...(Layers)>::type());
+                return backpropagateUnpacker(learningRate, input, expectedOutput, typename sequenceGenerator<sizeof...(Layers)>::type());
             }
 
             template <int traningIters = 2000>
@@ -28,13 +28,13 @@ namespace ai {
         private:
             // Backpropagation unpacker.
             template <int... S>
-            inline Matrix backpropagateHelper(float learningRate, const Matrix& input, const Matrix& expectedOutput, sequence<S...>) {
-                return backpropagateHelper(learningRate, input, expectedOutput, std::get<S>(layers)...);
+            inline Matrix backpropagateUnpacker(float learningRate, const Matrix& input, const Matrix& expectedOutput, sequence<S...>) {
+                return backpropagateRecursive(learningRate, input, expectedOutput, std::get<S>(layers)...);
             }
 
             // Backpropagation base case.
             template <typename BackLayer>
-            inline Matrix backpropagateHelper(float learningRate, const Matrix& input, const Matrix& expectedOutput, BackLayer& backLayer) {
+            inline Matrix backpropagateBaseCase(float learningRate, const Matrix& input, const Matrix& expectedOutput, BackLayer& backLayer) {
                 Matrix layerWeightedOutput = backLayer.getWeightedOutput(input);
                 Matrix layerActivationOutput = backLayer.activate(layerWeightedOutput);
                 // Compute cost derivative.
@@ -50,11 +50,11 @@ namespace ai {
 
             // Backpropagation recursion.
             template <typename FrontLayer, typename... BackLayers>
-            inline Matrix backpropagateHelper(float learningRate, const Matrix& input, const Matrix& expectedOutput, FrontLayer& frontLayer, BackLayers&... otherLayers) {
+            inline Matrix backpropagateRecursive(float learningRate, const Matrix& input, const Matrix& expectedOutput, FrontLayer& frontLayer, BackLayers&... otherLayers) {
                 Matrix layerWeightedOutput = frontLayer.getWeightedOutput(input);
                 Matrix layerActivationOutput = frontLayer.activate(layerWeightedOutput);
                 // This will give us intermediateDeltas from the next layer.
-                Matrix intermediateDeltas = backpropagateHelper(learningRate, layerActivationOutput, expectedOutput, otherLayers...);
+                Matrix intermediateDeltas = backpropagateBaseCase(learningRate, layerActivationOutput, expectedOutput, otherLayers...);
                 // Use the intermediateDeltas to calculate this layer's deltas.
                 Matrix deltas = frontLayer.computeDeltas(intermediateDeltas, layerWeightedOutput);
                 // Now compute intermediate deltas for the layer before this one.

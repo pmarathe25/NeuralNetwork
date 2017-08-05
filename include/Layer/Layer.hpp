@@ -48,8 +48,8 @@ namespace ai {
     template <typename Matrix>
     class Layer {
     public:
-        virtual void write(std::ofstream& saveFile) const = 0;
-        virtual void read(std::ifstream& saveFile) = 0;
+        virtual void save(std::ofstream& saveFile) const = 0;
+        virtual void load(std::ifstream& saveFile) = 0;
         virtual Matrix feedForward(const Matrix& input) const = 0;
         virtual Matrix getWeightedOutput(const Matrix& input) const = 0;
         virtual Matrix activate(const Matrix& weightedOutput) const = 0;
