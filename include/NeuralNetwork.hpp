@@ -23,7 +23,7 @@ namespace ai {
         public:
             NeuralNetwork() { }
 
-            NeuralNetwork(Layers... layers) : layers(layers...) { }
+            NeuralNetwork(Layers&... layers) : layers(layers...) { }
 
             Matrix feedForward(const Matrix& input) {
                 return getLayerOutput<sizeof...(Layers)>(input);
@@ -34,14 +34,18 @@ namespace ai {
                 return feedForwardUnpacker(input, typename sequenceGenerator<layerNum>::type());
             }
 
+            int getNetworkDepth() {
+                return sizeof...(Layers);
+            }
+
             // Return a tuple of const references to layers.
             const std::tuple<Layers&...> getLayers() const {
-                return getLayersUnpacker(typename sequenceGenerator<sizeof...(Layers)>::type());
+                return layers;
             }
 
             // Return a tuple of non-const references to layers.
             std::tuple<Layers&...> getLayers() {
-                return getLayersUnpacker(typename sequenceGenerator<sizeof...(Layers)>::type());
+                return layers;
             }
 
         private:
@@ -63,12 +67,7 @@ namespace ai {
                 return feedForwardRecursive(frontLayer.feedForward(input), otherLayers...);
             }
 
-            template <int... S>
-            std::tuple<Layers&...> getLayersUnpacker(sequence<S...>) {
-                return std::forward_as_tuple(std::get<S>(layers)...);
-            }
-
-            std::tuple<Layers...> layers;
+            std::tuple<Layers&...> layers;
     };
 }
 

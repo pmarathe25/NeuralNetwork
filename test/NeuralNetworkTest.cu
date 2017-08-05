@@ -15,9 +15,13 @@ int main() {
     Matrix_F input({10, 7.5, 5, 2.5, 0, -2.5, -7.5, -10}, 8);
     Matrix_F expectedOutput = input.applyFunction<ai::sigmoid>();
 
-    NeuralNetwork_F<SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F> layerTest(SigmoidFCL_F(1, 100), LeakyReLUFCL_F(100, 100), LeakyReLUFCL_F(100, 1));
+    SigmoidFCL_F inputLayer(1, 25);
+    LeakyReLUFCL_F hiddenLayer1(25, 25);
+    LeakyReLUFCL_F outputLayer(25, 1);
+
+    NeuralNetwork_F<SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F> layerTest(inputLayer, hiddenLayer1, hiddenLayer1, outputLayer);
     // Let's create an optimizer!
-    ai::NeuralNetworkOptimizer<Matrix_F, ai::mse_prime<Matrix_F>, SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F> optimizer(layerTest);
+    ai::NeuralNetworkOptimizer<Matrix_F, ai::mse_prime<Matrix_F>, SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F> optimizer(layerTest);
     std::cout << "Testing Layer Manager feedForward" << std::endl;
     layerTest.feedForward(input).display();
 
@@ -29,12 +33,12 @@ int main() {
     layerTest.feedForward(input).display();
 
     // Let's do weight saving!
-    ai::NeuralNetworkSaver<Matrix_F, SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F> saver(layerTest);
+    ai::NeuralNetworkSaver<Matrix_F, SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F> saver(layerTest);
     saver.save("./test/networkWeights.bin");
 
     // Let's do weights loading!
-    NeuralNetwork_F<SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F> loadingTest;
-    ai::NeuralNetworkSaver<Matrix_F, SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F> loader(loadingTest);
+    NeuralNetwork_F<SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F> loadingTest(inputLayer, hiddenLayer1, hiddenLayer1, outputLayer);
+    ai::NeuralNetworkSaver<Matrix_F, SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F> loader(loadingTest);
     loader.load("./test/networkWeights.bin");
     std::cout << "Loaded Network" << '\n';
     loadingTest.feedForward(input).display();
