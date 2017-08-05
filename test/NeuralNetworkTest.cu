@@ -38,12 +38,12 @@ int main() {
 
     // Let's do weight saving!
     ai::NeuralNetworkSaver<Matrix_F, SigmoidFCL_F, ReLUFCL_F> saver(layerTest);
-    saver.save("./test/networkWeights");
+    saver.save("./test/networkWeights.bin");
 
     // Let's do weights loading!
     NeuralNetwork_F<SigmoidFCL_F, ReLUFCL_F> loadingTest;
     ai::NeuralNetworkSaver<Matrix_F, SigmoidFCL_F, ReLUFCL_F> loader(loadingTest);
-    loader.load("./test/networkWeights");
+    loader.load("./test/networkWeights.bin");
     std::cout << "Loaded Network" << '\n';
     loadingTest.feedForward(input).display();
 
