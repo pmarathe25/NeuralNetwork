@@ -34,7 +34,7 @@ namespace ai {
 
             // Backpropagation base case.
             template <typename BackLayer>
-            inline Matrix backpropagateBaseCase(float learningRate, const Matrix& input, const Matrix& expectedOutput, BackLayer& backLayer) {
+            inline Matrix backpropagateRecursive(float learningRate, const Matrix& input, const Matrix& expectedOutput, BackLayer& backLayer) {
                 Matrix layerWeightedOutput = backLayer.getWeightedOutput(input);
                 Matrix layerActivationOutput = backLayer.activate(layerWeightedOutput);
                 // Compute cost derivative.
@@ -54,7 +54,7 @@ namespace ai {
                 Matrix layerWeightedOutput = frontLayer.getWeightedOutput(input);
                 Matrix layerActivationOutput = frontLayer.activate(layerWeightedOutput);
                 // This will give us intermediateDeltas from the next layer.
-                Matrix intermediateDeltas = backpropagateBaseCase(learningRate, layerActivationOutput, expectedOutput, otherLayers...);
+                Matrix intermediateDeltas = backpropagateRecursive(learningRate, layerActivationOutput, expectedOutput, otherLayers...);
                 // Use the intermediateDeltas to calculate this layer's deltas.
                 Matrix deltas = frontLayer.computeDeltas(intermediateDeltas, layerWeightedOutput);
                 // Now compute intermediate deltas for the layer before this one.

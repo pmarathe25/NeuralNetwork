@@ -45,7 +45,7 @@ namespace ai {
 
             // Weight saving base case.
             template <typename BackLayer>
-            inline void saveBaseCase(std::ofstream& saveFile, BackLayer& backLayer) {
+            inline void saveRecursive(std::ofstream& saveFile, BackLayer& backLayer) {
                 backLayer.save(saveFile);
             }
 
@@ -54,7 +54,7 @@ namespace ai {
             inline void saveRecursive(std::ofstream& saveFile, FrontLayer& frontLayer, BackLayers&... otherLayers) {
                 // Save this layer then do the others.
                 frontLayer.save(saveFile);
-                saveBaseCase(saveFile, otherLayers...);
+                saveRecursive(saveFile, otherLayers...);
             }
 
             // Weight loading unpacker.
@@ -65,7 +65,7 @@ namespace ai {
 
             // Weight loading base case.
             template <typename BackLayer>
-            inline void loadBaseCase(std::ifstream& saveFile, BackLayer& backLayer) {
+            inline void loadRecursive(std::ifstream& saveFile, BackLayer& backLayer) {
                 backLayer.load(saveFile);
             }
 
@@ -74,7 +74,7 @@ namespace ai {
             inline void loadRecursive(std::ifstream& saveFile, FrontLayer& frontLayer, BackLayers&... otherLayers) {
                 // Save this layer then do the others.
                 frontLayer.load(saveFile);
-                loadBaseCase(saveFile, otherLayers...);
+                loadRecursive(saveFile, otherLayers...);
             }
 
             std::tuple<Layers&...> layers;

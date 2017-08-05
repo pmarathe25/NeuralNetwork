@@ -53,14 +53,14 @@ namespace ai {
 
             // Feed forward base case.
             template <typename BackLayer>
-            inline Matrix feedForwardBaseCase(const Matrix& input, BackLayer& backLayer) {
+            inline Matrix feedForwardRecursive(const Matrix& input, BackLayer& backLayer) {
                 return backLayer.feedForward(input);
             }
 
             // Feed forward recursion.
             template <typename FrontLayer, typename... BackLayers>
             inline Matrix feedForwardRecursive(const Matrix& input, FrontLayer& frontLayer, BackLayers&... otherLayers) {
-                return feedForwardBaseCase(frontLayer.feedForward(input), otherLayers...);
+                return feedForwardRecursive(frontLayer.feedForward(input), otherLayers...);
             }
 
             template <int... S>
