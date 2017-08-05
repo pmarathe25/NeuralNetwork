@@ -52,8 +52,8 @@ namespace ai {
 
         // Train!
         void sgd(const Matrix& input, const Matrix& deltas, float learningRate) {
-            weights -= input.transpose() * deltas * learningRate / (float) deltas.numRows();
-            biases -= deltas.rowMean() * learningRate;
+            weights -= input.transpose() * deltas * learningRate;
+            biases -= deltas.weightedSum() * learningRate;
         }
 
         const Matrix& getWeights() const {

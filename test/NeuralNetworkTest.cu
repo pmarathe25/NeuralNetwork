@@ -25,8 +25,7 @@ int main() {
     std::cout << "Expected" << std::endl;
     expectedOutput.display();
     std::cout << "Actual" << std::endl;
-    optimizer.train(input, expectedOutput, 0.01);
-    // layerTest.train(input, expectedOutput, 0.001);
+    optimizer.train(input, expectedOutput, 0.001);
     layerTest.feedForward(input).display();
 
     // Let's do weight saving!
