@@ -5,23 +5,24 @@
 #include <fstream>
 
 namespace ai {
-    template <typename Matrix, typename... Layers>
     class NeuralNetworkSaver {
         public:
-            NeuralNetworkSaver(NeuralNetwork<Matrix, Layers...>& target) : layers(target.getLayers()) { }
+            NeuralNetworkSaver() { }
 
-            void save(const std::string& filePath) {
+            template <typename Matrix, typename... Layers>
+            void save(NeuralNetwork<Matrix, Layers...>& network, const std::string& filePath) {
                 std::ofstream saveFile(filePath);
                 if (saveFile.is_open()) {
                     int numLayers = sizeof...(Layers);
                     saveFile.write(reinterpret_cast<char*>(&numLayers), sizeof numLayers);
-                    saveUnpacker(saveFile, typename sequenceGenerator<sizeof...(Layers)>::type());
+                    saveUnpacker(saveFile, typename sequenceGenerator<sizeof...(Layers)>::type(), network.getLayers());
                 } else {
                     throw std::invalid_argument("Could not open file.");
                 }
             }
 
-            void load(const std::string& filePath) {
+            template <typename Matrix, typename... Layers>
+            void load(NeuralNetwork<Matrix, Layers...>& network, const std::string& filePath) {
                 std::ifstream saveFile(filePath);
                 if (saveFile.is_open()) {
                     // Check if it has the correct number of layers.
@@ -30,7 +31,7 @@ namespace ai {
                     if (numLayers != sizeof...(Layers)) {
                         throw std::invalid_argument("Network depth mismatch during load from file.");
                     }
-                    loadUnpacker(saveFile, typename sequenceGenerator<sizeof...(Layers)>::type());
+                    loadUnpacker(saveFile, typename sequenceGenerator<sizeof...(Layers)>::type(), network.getLayers());
                 } else {
                     throw std::invalid_argument("Could not open file.");
                 }
@@ -38,8 +39,8 @@ namespace ai {
 
         private:
             // Weight saving unpacker.
-            template <int... S>
-            inline void saveUnpacker(std::ofstream& saveFile, sequence<S...>) {
+            template <int... S, typename... Layers>
+            inline void saveUnpacker(std::ofstream& saveFile, sequence<S...>, std::tuple<Layers&...> layers) {
                 saveRecursive(saveFile, std::get<S>(layers)...);
             }
 
@@ -58,8 +59,8 @@ namespace ai {
             }
 
             // Weight loading unpacker.
-            template <int... S>
-            inline void loadUnpacker(std::ifstream& saveFile, sequence<S...>) {
+            template <int... S, typename... Layers>
+            inline void loadUnpacker(std::ifstream& saveFile, sequence<S...>, std::tuple<Layers&...> layers) {
                 loadRecursive(saveFile, std::get<S>(layers)...);
             }
 
@@ -77,7 +78,6 @@ namespace ai {
                 loadRecursive(saveFile, otherLayers...);
             }
 
-            std::tuple<Layers&...> layers;
     };
 } /* namespace ai */
 

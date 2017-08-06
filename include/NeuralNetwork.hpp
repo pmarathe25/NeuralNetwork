@@ -34,7 +34,7 @@ namespace ai {
                 return feedForwardUnpacker(input, typename sequenceGenerator<layerNum>::type());
             }
 
-            int getNetworkDepth() {
+            int getDepth() {
                 return sizeof...(Layers);
             }
 
