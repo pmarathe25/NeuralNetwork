@@ -5,7 +5,7 @@
 
 namespace ai {
     template <typename Matrix>
-    Matrix mse_prime(const Matrix& networkOutput, const Matrix& expectedOutput) {
+    inline Matrix mse_prime(const Matrix& networkOutput, const Matrix& expectedOutput) {
         return networkOutput - expectedOutput;
     }
 
