@@ -14,7 +14,7 @@ template <typename... Layers>
 using NeuralNetwork_F = ai::NeuralNetwork<Matrix_F, Layers...>;
 
 int main() {
-    Matrix_F input({10, 7.5, 5, 2.5, 0, -2.5, -7.5, -10}, 8);
+    Matrix_F input({100, 10, 7.5, 5, 2.5, 0, -2.5, -7.5, -10, -100}, 10);
     Matrix_F expectedOutput = input.applyFunction<ai::sigmoid>();
 
     SigmoidFCL_F inputLayer(1, 25);
