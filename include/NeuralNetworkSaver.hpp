@@ -1,6 +1,7 @@
 #ifndef NEURAL_NETWORK_SAVER_H
 #define NEURAL_NETWORK_SAVER_H
 #include "NeuralNetwork.hpp"
+#include <unordered_set>
 #include <tuple>
 #include <string>
 #include <fstream>
@@ -42,41 +43,55 @@ namespace ai {
             // Weight saving unpacker.
             template <int... S, typename... Layers>
             static inline void saveUnpacker(std::ofstream& saveFile, sequence<S...>, std::tuple<Layers&...> layers) {
-                saveRecursive(saveFile, std::get<S>(layers)...);
+                std::unordered_set<void*> savedLayers;
+                saveRecursive(saveFile, savedLayers, std::get<S>(layers)...);
             }
 
             // Weight saving base case.
             template <typename BackLayer>
-            static inline void saveRecursive(std::ofstream& saveFile, BackLayer& backLayer) {
-                backLayer.save(saveFile);
+            static inline void saveRecursive(std::ofstream& saveFile, std::unordered_set<void*>& savedLayers, BackLayer& backLayer) {
+                if (!savedLayers.count(&backLayer)) {
+                    backLayer.save(saveFile);
+                    savedLayers.insert(&backLayer);
+                }
             }
 
             // Weight saving recursion.
             template <typename FrontLayer, typename... BackLayers>
-            static inline void saveRecursive(std::ofstream& saveFile, FrontLayer& frontLayer, BackLayers&... otherLayers) {
-                // Save this layer then do the others.
-                frontLayer.save(saveFile);
-                saveRecursive(saveFile, otherLayers...);
+            static inline void saveRecursive(std::ofstream& saveFile, std::unordered_set<void*>& savedLayers, FrontLayer& frontLayer, BackLayers&... otherLayers) {
+                // Save this layer if it has not been already then do the others.
+                if (!savedLayers.count(&frontLayer)) {
+                    frontLayer.save(saveFile);
+                    savedLayers.insert(&frontLayer);
+                }
+                saveRecursive(saveFile, savedLayers, otherLayers...);
             }
 
             // Weight loading unpacker.
             template <int... S, typename... Layers>
             static inline void loadUnpacker(std::ifstream& saveFile, sequence<S...>, std::tuple<Layers&...> layers) {
-                loadRecursive(saveFile, std::get<S>(layers)...);
+                std::unordered_set<void*> loadedLayers;
+                loadRecursive(saveFile, loadedLayers, std::get<S>(layers)...);
             }
 
             // Weight loading base case.
             template <typename BackLayer>
-            static inline void loadRecursive(std::ifstream& saveFile, BackLayer& backLayer) {
-                backLayer.load(saveFile);
+            static inline void loadRecursive(std::ifstream& saveFile, std::unordered_set<void*>& loadedLayers, BackLayer& backLayer) {
+                if (!loadedLayers.count(&backLayer)) {
+                    backLayer.load(saveFile);
+                    loadedLayers.insert(&backLayer);
+                }
             }
 
             // Weight loading recursion.
             template <typename FrontLayer, typename... BackLayers>
-            static inline void loadRecursive(std::ifstream& saveFile, FrontLayer& frontLayer, BackLayers&... otherLayers) {
-                // Save this layer then do the others.
-                frontLayer.load(saveFile);
-                loadRecursive(saveFile, otherLayers...);
+            static inline void loadRecursive(std::ifstream& saveFile, std::unordered_set<void*>& loadedLayers, FrontLayer& frontLayer, BackLayers&... otherLayers) {
+                // Load this layer if it hasn't been already then do the others.
+                if (!loadedLayers.count(&frontLayer)) {
+                    frontLayer.load(saveFile);
+                    loadedLayers.insert(&frontLayer);
+                }
+                loadRecursive(saveFile, loadedLayers, otherLayers...);
             }
 
     };
