@@ -8,27 +8,28 @@ namespace ai {
         return networkOutput - expectedOutput;
     }
 
-    template <typename Matrix, Matrix (*costDeriv)(const Matrix&, const Matrix&), typename... Layers>
+    template <typename Matrix, Matrix (*costDeriv)(const Matrix&, const Matrix&)>
     class NeuralNetworkOptimizer {
         public:
-            NeuralNetworkOptimizer(NeuralNetwork<Matrix, Layers...>& target) : layers(target.getLayers()) { }
+            NeuralNetworkOptimizer() { }
 
-            Matrix backpropagate(const Matrix& input, const Matrix& expectedOutput, float learningRate = 0.001) {
-                return backpropagateUnpacker(learningRate, input, expectedOutput, typename sequenceGenerator<sizeof...(Layers)>::type());
+            template <typename... Layers>
+            Matrix backpropagate(NeuralNetwork<Matrix, Layers...>& network, const Matrix& input, const Matrix& expectedOutput, float learningRate = 0.001) {
+                return backpropagateUnpacker(learningRate, input, expectedOutput, typename sequenceGenerator<sizeof...(Layers)>::type(), network.getLayers());
             }
 
-            template <int traningIters = 2000>
-            void train(const Matrix& input, const Matrix& expectedOutput, float learningRate = 0.001) {
+            template <int traningIters = 2000, typename... Layers>
+            void train(NeuralNetwork<Matrix, Layers...>& network, const Matrix& input, const Matrix& expectedOutput, float learningRate = 0.001) {
                 // Ask the compiler to unroll this, since we know trainingIters at compile time.
                 #pragma unroll
                 for (int i = traningIters; i > 0; --i) {
-                    backpropagate(input, expectedOutput, learningRate);
+                    backpropagate(network, input, expectedOutput, learningRate);
                 }
             }
         private:
             // Backpropagation unpacker.
-            template <int... S>
-            inline Matrix backpropagateUnpacker(float learningRate, const Matrix& input, const Matrix& expectedOutput, sequence<S...>) {
+            template <int... S, typename... Layers>
+            inline Matrix backpropagateUnpacker(float learningRate, const Matrix& input, const Matrix& expectedOutput, sequence<S...>, std::tuple<Layers&...> layers) {
                 return backpropagateRecursive(learningRate, input, expectedOutput, std::get<S>(layers)...);
             }
 
@@ -63,8 +64,6 @@ namespace ai {
                 frontLayer.sgd(input, deltas, learningRate);
                 return previousIntermediateDeltas;
             }
-
-            std::tuple<Layers&...> layers;
     };
 }
 
