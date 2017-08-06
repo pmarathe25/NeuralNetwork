@@ -1,6 +1,7 @@
 #ifndef NEURAL_NETWORK_OPTIMIZER_H
 #define NEURAL_NETWORK_OPTIMIZER_H
 #include "NeuralNetwork.hpp"
+#include <tuple>
 
 namespace ai {
     template <typename Matrix>
@@ -18,7 +19,7 @@ namespace ai {
                 return backpropagateUnpacker(learningRate, input, expectedOutput, typename sequenceGenerator<sizeof...(Layers)>::type(), network.getLayers());
             }
 
-            template <int traningIters = 2000, typename... Layers>
+            template <int traningIters = 1000, typename... Layers>
             void train(NeuralNetwork<Matrix, Layers...>& network, const Matrix& input, const Matrix& expectedOutput, float learningRate = 0.001) {
                 // Ask the compiler to unroll this, since we know trainingIters at compile time.
                 #pragma unroll

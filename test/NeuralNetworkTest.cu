@@ -31,6 +31,9 @@ int main() {
     std::cout << "Expected" << std::endl;
     expectedOutput.display();
     std::cout << "Actual" << std::endl;
+    // Train for 1 iterations.
+    optimizer.train<1>(layerTest, input, expectedOutput, 0.01);
+    // Train for 1000 iterations (default).
     optimizer.train(layerTest, input, expectedOutput, 0.01);
     layerTest.feedForward(input).display();
 

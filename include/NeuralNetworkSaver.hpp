@@ -1,6 +1,7 @@
 #ifndef NEURAL_NETWORK_SAVER_H
 #define NEURAL_NETWORK_SAVER_H
 #include "NeuralNetwork.hpp"
+#include <tuple>
 #include <string>
 #include <fstream>
 
