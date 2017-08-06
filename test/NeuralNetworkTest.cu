@@ -4,6 +4,7 @@
 #include "NeuralNetworkOptimizer.hpp"
 #include "NeuralNetworkSaver.hpp"
 
+// Define layers using a custom matrix class.
 typedef SigmoidFCL<Matrix_F> SigmoidFCL_F;
 typedef ReLUFCL<Matrix_F> ReLUFCL_F;
 typedef LeakyReLUFCL<Matrix_F> LeakyReLUFCL_F;

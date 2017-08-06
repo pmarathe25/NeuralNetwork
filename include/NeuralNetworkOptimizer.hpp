@@ -9,7 +9,7 @@ namespace ai {
         return networkOutput - expectedOutput;
     }
 
-    template <typename Matrix, Matrix (*costDeriv)(const Matrix&, const Matrix&)>
+    template <typename Matrix, Matrix (costDeriv)(const Matrix&, const Matrix&)>
     class NeuralNetworkOptimizer {
         public:
             NeuralNetworkOptimizer() { }

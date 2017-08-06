@@ -3,7 +3,7 @@
 #include "Layer/Layer.hpp"
 
 namespace ai {
-    template <typename Matrix, float (*activationFunc)(float), float (*activationDeriv)(float)>
+    template <typename Matrix, float (activationFunc)(float), float (*activationDeriv)(float)>
     class FullyConnectedLayer : Layer<Matrix> {
     public:
         FullyConnectedLayer() { }
