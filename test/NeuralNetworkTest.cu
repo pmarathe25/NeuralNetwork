@@ -5,6 +5,7 @@
 #include "NeuralNetworkSaver.hpp"
 
 // Define layers using a custom matrix class.
+typedef LinearFCL<Matrix_F> LinearFCL_F;
 typedef SigmoidFCL<Matrix_F> SigmoidFCL_F;
 typedef ReLUFCL<Matrix_F> ReLUFCL_F;
 typedef LeakyReLUFCL<Matrix_F> LeakyReLUFCL_F;
@@ -18,9 +19,9 @@ int main() {
 
     SigmoidFCL_F inputLayer(1, 25);
     LeakyReLUFCL_F hiddenLayer1(25, 25);
-    LeakyReLUFCL_F outputLayer(25, 1);
+    LinearFCL_F outputLayer(25, 1);
 
-    NeuralNetwork_F<SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F> layerTest(inputLayer, hiddenLayer1, hiddenLayer1, outputLayer);
+    NeuralNetwork_F<SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F, LinearFCL_F> layerTest(inputLayer, hiddenLayer1, hiddenLayer1, outputLayer);
 
     std::cout << "Testing Layer Manager feedForward" << std::endl;
     layerTest.feedForward(input).display();
@@ -32,17 +33,17 @@ int main() {
     std::cout << "Expected" << std::endl;
     expectedOutput.display();
     std::cout << "Actual" << std::endl;
-    // Train for 1 iterations.
-    optimizer.train<1>(layerTest, input, expectedOutput, 0.01);
-    // Train for 1000 iterations (default).
+    // Train for 1 iteration (default).
     optimizer.train(layerTest, input, expectedOutput, 0.01);
+    // Train for 1000 iterations.
+    optimizer.train<1000>(layerTest, input, expectedOutput, 0.01);
     layerTest.feedForward(input).display();
 
     // Let's do weight saving using a saver!
     ai::NeuralNetworkSaver saver;
     saver.save(layerTest, "./test/networkWeights.bin");
 
-    NeuralNetwork_F<SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F> loadingTest(inputLayer, hiddenLayer1, hiddenLayer1, outputLayer);
+    NeuralNetwork_F<SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F, LinearFCL_F> loadingTest(inputLayer, hiddenLayer1, hiddenLayer1, outputLayer);
     // Let's do weights loading! We can use both the save and load methods statically too!
     ai::NeuralNetworkSaver::load(loadingTest, "./test/networkWeights.bin");
     std::cout << "Loaded Network" << '\n';

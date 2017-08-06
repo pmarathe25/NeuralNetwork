@@ -77,6 +77,8 @@ namespace ai {
 
 // Define some common layers.
 template <typename Matrix>
+using LinearFCL = ai::FullyConnectedLayer<Matrix, ai::linear, ai::linear_prime>;
+template <typename Matrix>
 using SigmoidFCL = ai::FullyConnectedLayer<Matrix, ai::sigmoid, ai::sigmoid_prime>;
 template <typename Matrix>
 using ReLUFCL = ai::FullyConnectedLayer<Matrix, ai::relu, ai::relu_prime>;

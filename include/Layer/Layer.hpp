@@ -4,6 +4,16 @@
 
 namespace ai {
     template <typename T>
+    __device__ T linear(T in) {
+        return in;
+    }
+
+    template <typename T>
+    __device__ T linear_prime(T in) {
+        return 1;
+    }
+
+    template <typename T>
     __device__ T sigmoid(T in) {
         return 1 / (1 + exp(-in));
     }
