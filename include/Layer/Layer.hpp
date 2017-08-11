@@ -30,6 +30,11 @@ namespace ai {
     }
 
     template <typename T>
+    __device__ T analytic_prime(T in) {
+        return 1 / (1 + exp(-in));
+    }
+
+    template <typename T>
     __device__ T relu(T in) {
         return (in > 0) ? in : 0;
     }
@@ -48,12 +53,6 @@ namespace ai {
     __device__ T leakyRelu_prime(T in) {
         return (in > 0) ? 1 : 0.01;
     }
-
-    enum activationFunction {
-        SIGMOID = 0,
-        ANALYTIC,
-        RELU,
-    };
 
     template <typename Matrix>
     class Layer {

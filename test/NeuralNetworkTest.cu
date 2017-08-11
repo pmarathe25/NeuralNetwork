@@ -17,9 +17,9 @@ int main() {
     Matrix_F input({100, 10, 7.5, 5, 2.5, 0, -2.5, -7.5, -10, -100}, 10);
     Matrix_F expectedOutput = input.applyFunction<ai::sigmoid>();
 
-    SigmoidFCL_F inputLayer(1, 25);
-    LeakyReLUFCL_F hiddenLayer1(25, 25);
-    LinearFCL_F outputLayer(25, 1);
+    SigmoidFCL_F inputLayer(1, 50);
+    LeakyReLUFCL_F hiddenLayer1(50, 50);
+    LinearFCL_F outputLayer(50, 1);
 
     NeuralNetwork_F<SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F, LinearFCL_F> layerTest(inputLayer, hiddenLayer1, hiddenLayer1, outputLayer);
 
@@ -27,13 +27,11 @@ int main() {
 
     // Let's create an optimizer!
     ai::NeuralNetworkOptimizer<Matrix_F, ai::mse_prime<Matrix_F>> optimizer;
-
-    std::cout << "Testing Layer Manager training" << std::endl;
-    expectedOutput.display("Expected");
+    expectedOutput.display("Testing Layer Manager training\nExpected");
     // Train for 1 iteration (default).
     optimizer.train(layerTest, input, expectedOutput, 0.01);
     // Train for 1000 iterations.
-    optimizer.train<1000>(layerTest, input, expectedOutput, 0.01);
+    optimizer.train<4000>(layerTest, input, expectedOutput, 0.01);
     layerTest.feedForward(input).display("Actual");
 
     // Let's do weight saving using a saver!
