@@ -23,21 +23,18 @@ int main() {
 
     NeuralNetwork_F<SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F, LinearFCL_F> layerTest(inputLayer, hiddenLayer1, hiddenLayer1, outputLayer);
 
-    std::cout << "Testing Layer Manager feedForward" << std::endl;
-    layerTest.feedForward(input).display();
+    layerTest.feedForward(input).display("Testing Layer Manager feedForward");
 
     // Let's create an optimizer!
     ai::NeuralNetworkOptimizer<Matrix_F, ai::mse_prime<Matrix_F>> optimizer;
 
     std::cout << "Testing Layer Manager training" << std::endl;
-    std::cout << "Expected" << std::endl;
-    expectedOutput.display();
-    std::cout << "Actual" << std::endl;
+    expectedOutput.display("Expected");
     // Train for 1 iteration (default).
     optimizer.train(layerTest, input, expectedOutput, 0.01);
     // Train for 1000 iterations.
     optimizer.train<1000>(layerTest, input, expectedOutput, 0.01);
-    layerTest.feedForward(input).display();
+    layerTest.feedForward(input).display("Actual");
 
     // Let's do weight saving using a saver!
     ai::NeuralNetworkSaver saver;
@@ -46,7 +43,6 @@ int main() {
     NeuralNetwork_F<SigmoidFCL_F, LeakyReLUFCL_F, LeakyReLUFCL_F, LinearFCL_F> loadingTest(inputLayer, hiddenLayer1, hiddenLayer1, outputLayer);
     // Let's do weights loading! We can use both the save and load methods statically too!
     ai::NeuralNetworkSaver::load(loadingTest, "./test/networkWeights.bin");
-    std::cout << "Loaded Network" << '\n';
-    loadingTest.feedForward(input).display();
+    loadingTest.feedForward(input).display("Loaded Network");
 
 }

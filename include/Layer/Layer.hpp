@@ -31,22 +31,22 @@ namespace ai {
 
     template <typename T>
     __device__ T relu(T in) {
-        return (in < 0) ? 0 : in;
+        return (in > 0) ? in : 0;
     }
 
     template <typename T>
     __device__ T relu_prime(T in) {
-        return (in < 0) ? 0 : 1;
+        return (in > 0) ? 1 : 0;
     }
 
     template <typename T>
     __device__ T leakyRelu(T in) {
-        return (in < 0) ? 0.01 * in : in;
+        return (in > 0) ? in : 0.01 * in;
     }
 
     template <typename T>
     __device__ T leakyRelu_prime(T in) {
-        return (in < 0) ? 0.01 : 1;
+        return (in > 0) ? 1 : 0.01;
     }
 
     enum activationFunction {

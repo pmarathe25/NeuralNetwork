@@ -15,8 +15,6 @@ namespace ai {
             static void save(NeuralNetwork<Matrix, Layers...>& network, const std::string& filePath) {
                 std::ofstream saveFile(filePath);
                 if (saveFile.is_open()) {
-                    int numLayers = sizeof...(Layers);
-                    saveFile.write(reinterpret_cast<char*>(&numLayers), sizeof numLayers);
                     saveUnpacker(saveFile, typename sequenceGenerator<sizeof...(Layers)>::type(), network.getLayers());
                 } else {
                     throw std::invalid_argument("Could not open file.");
@@ -27,13 +25,11 @@ namespace ai {
             static void load(NeuralNetwork<Matrix, Layers...>& network, const std::string& filePath) {
                 std::ifstream saveFile(filePath);
                 if (saveFile.is_open()) {
-                    // Check if it has the correct number of layers.
-                    int numLayers = sizeof...(Layers);
-                    saveFile.read(reinterpret_cast<char*>(&numLayers), sizeof numLayers);
-                    if (numLayers != sizeof...(Layers)) {
-                        throw std::invalid_argument("Network depth mismatch during load from file.");
+                    try {
+                        loadUnpacker(saveFile, typename sequenceGenerator<sizeof...(Layers)>::type(), network.getLayers());
+                    } catch (const std::exception& e) {
+                        throw std::invalid_argument("Network mismatch during load from file.");
                     }
-                    loadUnpacker(saveFile, typename sequenceGenerator<sizeof...(Layers)>::type(), network.getLayers());
                 } else {
                     throw std::invalid_argument("Could not open file.");
                 }
