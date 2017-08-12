@@ -25,8 +25,8 @@ namespace ai {
         }
 
         void load(std::ifstream& saveFile) {
-            weights = Matrix::load(saveFile);
-            biases = Matrix::load(saveFile);
+            weights.load(saveFile);
+            biases.load(saveFile);
         }
 
         Matrix feedForward(const Matrix& input) const {
