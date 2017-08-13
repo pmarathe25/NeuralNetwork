@@ -37,7 +37,7 @@ int main() {
     // Train for 1 iteration (default).
     optimizer.trainMinibatch(layerTest, trainingData, 0.01);
     // Train for 1000 iterations.
-    // optimizer.trainMinibatch<4000>(layerTest, trainingData, 0.01);
+    optimizer.trainMinibatch<1000>(layerTest, trainingData, 0.01);
     layerTest.feedForward(input).display("Actual");
 
     // Let's do weight saving using a saver!
@@ -48,6 +48,4 @@ int main() {
     // Let's do weights loading! We can use both the save and load methods statically too!
     ai::NeuralNetworkSaver::load(loadingTest, "./test/networkWeights.bin");
     loadingTest.feedForward(input).display("Loaded Network");
-
-    optimizer.train(layerTest, "/home/pranav/C++/DigitRecognizer/data/training", 0.01);
 }

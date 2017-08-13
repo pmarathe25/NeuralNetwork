@@ -36,7 +36,13 @@ namespace ai {
 
             template <int numEpochs = 1, typename... Layers>
             void train(NeuralNetwork<Matrix, Layers...>& network, const std::vector<Minibatch<Matrix>>& trainingBatches, float learningRate = 0.001) {
-
+                for (int i = 0; i < numEpochs; ++i) {
+                    // Loop over all minibatches.
+                    for (int j = 0; j < trainingBatches.size(); ++j) {
+                        trainMinibatch(network, trainingBatches[j], learningRate);
+                    }
+                    std::cout << "Finished Epoch " << i << '\n';
+                }
             }
 
             template <int numEpochs = 1, typename... Layers>
