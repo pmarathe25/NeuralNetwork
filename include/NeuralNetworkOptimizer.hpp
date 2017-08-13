@@ -16,6 +16,10 @@ namespace ai {
         public:
             NeuralNetworkOptimizer() { }
 
+            NeuralNetworkOptimizer(const std::string& minibatchFolder) {
+                loadMinibatches(minibatchFolder);
+            }
+
             template <typename... Layers>
             inline Matrix backpropagate(NeuralNetwork<Matrix, Layers...>& network, const Matrix& input, const Matrix& expectedOutput, float learningRate = 0.001) {
                 return backpropagateUnpacker(learningRate, input, expectedOutput, typename sequenceGenerator<sizeof...(Layers)>::type(), network.getLayers());
