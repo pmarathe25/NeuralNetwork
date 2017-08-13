@@ -27,11 +27,26 @@ namespace ai {
                 return trainingSet;
             }
 
+            // TODO: Shuffle the training set.
+            void shuffle() {
+
+            }
+
+            // TODO: Partition the data set according to ratios
+            void partitionTrainingSet(float training = 100, float validation = 0, float test = 0) {
+                int total = std::ceil(training + validation + test);
+                if (total == 100) {
+
+                } else {
+                    throw std::invalid_argument("Training Set sizes must add to 100%.")
+                }
+            }
+
             const std::vector<Minibatch<Matrix>>& getTrainingData() const {
                 return trainingSet;
             }
         private:
-            std::vector<Minibatch<Matrix>> trainingSet;
+            std::vector<Minibatch<Matrix>> trainingSet, validationSet, testSet;
     };
 } /* namespace ai */
 

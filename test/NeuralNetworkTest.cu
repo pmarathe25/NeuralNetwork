@@ -16,7 +16,8 @@ template <typename... Layers>
 using NeuralNetwork_F = ai::NeuralNetwork<Matrix_F, Layers...>;
 
 int main() {
-    Matrix_F input({100, 10, 7.5, 5, 2.5, 0, -2.5, -7.5, -10, -100}, 10);
+    // Matrix_F input({100, 10, 7.5, 5, 2.5, 0, -2.5, -7.5, -10, -100}, 10);
+    Matrix_F input({10, 0}, 2);
     Matrix_F expectedOutput = input.applyFunction<ai::sigmoid>();
 
     Minibatch_F trainingData(input, expectedOutput);
@@ -33,7 +34,7 @@ int main() {
     optimizer.getAverageCost(layerTest, trainingData).display("Initial average cost");
 
     // Let's create an optimizer!
-    expectedOutput.display("Testing Layer Manager training");
+    expectedOutput.display("Testing Layer Manager training\nExpected Output");
     // Train for 1 iteration.
     optimizer.trainMinibatch(layerTest, trainingData, 0.01);
     // Train for 1000 epochs.
