@@ -23,10 +23,10 @@ namespace ai {
 
             template <typename Matrix, typename... Layers>
             static void load(NeuralNetwork<Matrix, Layers...>& network, const std::string& filePath) {
-                std::ifstream saveFile(filePath);
-                if (saveFile.is_open()) {
+                std::ifstream loadFile(filePath);
+                if (loadFile.is_open()) {
                     try {
-                        loadUnpacker(saveFile, typename sequenceGenerator<sizeof...(Layers)>::type(), network.getLayers());
+                        loadUnpacker(loadFile, typename sequenceGenerator<sizeof...(Layers)>::type(), network.getLayers());
                     } catch (const std::exception& e) {
                         throw std::invalid_argument("Network mismatch during load from file.");
                     }
@@ -65,29 +65,29 @@ namespace ai {
 
             // Weight loading unpacker.
             template <int... S, typename... Layers>
-            static inline void loadUnpacker(std::ifstream& saveFile, sequence<S...>, std::tuple<Layers&...> layers) {
+            static inline void loadUnpacker(std::ifstream& loadFile, sequence<S...>, std::tuple<Layers&...> layers) {
                 std::unordered_set<void*> loadedLayers;
-                loadRecursive(saveFile, loadedLayers, std::get<S>(layers)...);
+                loadRecursive(loadFile, loadedLayers, std::get<S>(layers)...);
             }
 
             // Weight loading base case.
             template <typename BackLayer>
-            static inline void loadRecursive(std::ifstream& saveFile, std::unordered_set<void*>& loadedLayers, BackLayer& backLayer) {
+            static inline void loadRecursive(std::ifstream& loadFile, std::unordered_set<void*>& loadedLayers, BackLayer& backLayer) {
                 if (!loadedLayers.count(&backLayer)) {
-                    backLayer.load(saveFile);
+                    backLayer.load(loadFile);
                     loadedLayers.insert(&backLayer);
                 }
             }
 
             // Weight loading recursion.
             template <typename FrontLayer, typename... BackLayers>
-            static inline void loadRecursive(std::ifstream& saveFile, std::unordered_set<void*>& loadedLayers, FrontLayer& frontLayer, BackLayers&... otherLayers) {
+            static inline void loadRecursive(std::ifstream& loadFile, std::unordered_set<void*>& loadedLayers, FrontLayer& frontLayer, BackLayers&... otherLayers) {
                 // Load this layer if it hasn't been already then do the others.
                 if (!loadedLayers.count(&frontLayer)) {
-                    frontLayer.load(saveFile);
+                    frontLayer.load(loadFile);
                     loadedLayers.insert(&frontLayer);
                 }
-                loadRecursive(saveFile, loadedLayers, otherLayers...);
+                loadRecursive(loadFile, loadedLayers, otherLayers...);
             }
 
     };

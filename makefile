@@ -21,8 +21,8 @@ $(TESTDIR)/NeuralNetworkTest: $(TESTOBJS) $(LIBS)
 	$(CXX) $(TESTLFLAGS) $(TESTOBJS) $(LIBS) -o $(TESTDIR)/NeuralNetworkTest
 
 $(BUILDDIR)/NeuralNetworkTest.o: $(TESTDIR)/NeuralNetworkTest.cu include/NeuralNetwork.hpp \
-	include/NeuralNetworkOptimizer.hpp include/NeuralNetworkSaver.hpp include/Layer/Layer.hpp \
-	include/Layer/FullyConnectedLayer.hpp
+	include/NeuralNetworkOptimizer.hpp include/Minibatch.hpp include/NeuralNetworkSaver.hpp \
+	include/Layer/Layer.hpp include/Layer/FullyConnectedLayer.hpp
 	$(CXX) $(CFLAGS) $(TESTDIR)/NeuralNetworkTest.cu -o $(BUILDDIR)/NeuralNetworkTest.o
 
 clean:

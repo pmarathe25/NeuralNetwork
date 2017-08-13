@@ -1,7 +1,9 @@
 #ifndef NEURAL_NETWORK_OPTIMIZER_H
 #define NEURAL_NETWORK_OPTIMIZER_H
 #include "NeuralNetwork.hpp"
+#include "Minibatch.hpp"
 #include <tuple>
+#include <dirent.h>
 
 namespace ai {
     template <typename Matrix>
@@ -19,12 +21,34 @@ namespace ai {
                 return backpropagateUnpacker(learningRate, input, expectedOutput, typename sequenceGenerator<sizeof...(Layers)>::type(), network.getLayers());
             }
 
+            std::vector<Minibatch<Matrix>> loadMinibatches(const std::string& minibatchFolder) {
+                std::vector<Minibatch<Matrix>> trainingData;
+                // Load all minibatches from the folder.
+                DIR* dir = opendir(minibatchFolder.c_str());
+                for (dirent* d = readdir(dir); d != NULL; d = readdir(dir)) {
+                    std::string filename = minibatchFolder + "/" + d -> d_name;
+                    if (Minibatch<Matrix>::isMinibatchFile(filename)) {
+                        trainingData.emplace_back(filename);
+                    }
+                }
+                return trainingData;
+            }
+
+            template <int numEpochs = 1, typename... Layers>
+            void train(NeuralNetwork<Matrix, Layers...>& network, const std::vector<Minibatch<Matrix>>& trainingBatches, float learningRate = 0.001) {
+
+            }
+
+            template <int numEpochs = 1, typename... Layers>
+            void train(NeuralNetwork<Matrix, Layers...>& network, const std::string& minibatchFolder, float learningRate = 0.001) {
+                std::vector<Minibatch<Matrix>> trainingData = loadMinibatches(minibatchFolder);
+                train<numEpochs>(network, trainingData, learningRate);
+            }
+
             template <int traningIters = 1, typename... Layers>
-            void train(NeuralNetwork<Matrix, Layers...>& network, const Matrix& input, const Matrix& expectedOutput, float learningRate = 0.001) {
-                // Ask the compiler to unroll this, since we know trainingIters at compile time.
-                #pragma unroll
+            void trainMinibatch(NeuralNetwork<Matrix, Layers...>& network, const Minibatch<Matrix>& minibatch, float learningRate = 0.001) {
                 for (int i = traningIters; i > 0; --i) {
-                    backpropagate(network, input, expectedOutput, learningRate);
+                    backpropagate(network, minibatch.getData(), minibatch.getLabels(), learningRate);
                 }
             }
         private:
