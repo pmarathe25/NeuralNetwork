@@ -50,6 +50,7 @@ namespace ai {
                 }
             }
 
+            // TODO: Uhh... something better than this I guess.
             template <int numEpochs = 1, typename... Layers>
             inline void trainWithValidation(NeuralNetwork<Matrix, Layers...>& network, const DataSet<Matrix>& trainingInputs, const DataSet<Matrix>& trainingExpectedOutputs,
                 const DataSet<Matrix>& validationInputs, const DataSet<Matrix>& validationExpectedOutputs, float learningRate = 0.001) {
