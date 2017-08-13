@@ -21,17 +21,17 @@ namespace ai {
                 for (dirent* d = readdir(dir); d != NULL; d = readdir(dir)) {
                     std::string filename = minibatchFolder + "/" + d -> d_name;
                     if (Minibatch<Matrix>::isMinibatchFile(filename)) {
-                        trainingData.emplace_back(filename);
+                        trainingSet.emplace_back(filename);
                     }
                 }
-                return trainingData;
+                return trainingSet;
             }
 
             const std::vector<Minibatch<Matrix>>& getTrainingData() const {
-                return trainingData;
+                return trainingSet;
             }
         private:
-            std::vector<Minibatch<Matrix>> trainingData;
+            std::vector<Minibatch<Matrix>> trainingSet;
     };
 } /* namespace ai */
 

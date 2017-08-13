@@ -22,7 +22,7 @@ namespace ai {
     template <typename Matrix, typename... Layers>
     class NeuralNetwork {
         public:
-            NeuralNetwork(const std::string& name, Layers&... layers) : layers(layers...), name(name) { }
+            NeuralNetwork(Layers&... layers) : layers(layers...) { }
 
             Matrix feedForward(const Matrix& input) {
                 return getLayerOutput<sizeof...(Layers)>(input);
@@ -35,10 +35,6 @@ namespace ai {
 
             int getDepth() {
                 return sizeof...(Layers);
-            }
-
-            const std::string& getName() const {
-                return name;
             }
 
             // Return a tuple of const references to layers.
@@ -71,7 +67,6 @@ namespace ai {
             }
 
             std::tuple<Layers&...> layers;
-            const std::string name;
     };
 }
 

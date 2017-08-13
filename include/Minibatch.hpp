@@ -11,9 +11,9 @@ namespace ai {
         public:
             Minibatch() { }
 
-            Minibatch(Matrix data, Matrix labels) {
+            Minibatch(Matrix data, Matrix expectedOutput) {
                 this -> data = data;
-                this -> labels = labels;
+                this -> expectedOutput = expectedOutput;
             }
 
             Minibatch(const std::string& filePath) {
@@ -32,7 +32,7 @@ namespace ai {
 
             void save(std::ofstream& saveFile) const {
                 data.save(saveFile);
-                labels.save(saveFile);
+                expectedOutput.save(saveFile);
             }
 
             void load(const std::string& filePath) {
@@ -46,7 +46,7 @@ namespace ai {
 
             void load(std::ifstream& loadFile) {
                 data.load(loadFile);
-                labels.load(loadFile);
+                expectedOutput.load(loadFile);
             }
 
             // Accessors
@@ -54,8 +54,8 @@ namespace ai {
                 return data;
             }
 
-            inline const Matrix& getLabels() const {
-                return labels;
+            inline const Matrix& getExpectedOutput() const {
+                return expectedOutput;
             }
 
             static bool isMinibatchFile(const std::string& fileName) {
@@ -63,7 +63,7 @@ namespace ai {
             }
 
         private:
-            Matrix data, labels;
+            Matrix data, expectedOutput;
     };
 } /* namespace ai */
 
