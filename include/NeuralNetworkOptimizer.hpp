@@ -17,12 +17,11 @@ namespace ai {
             NeuralNetworkOptimizer() { }
 
             template <typename... Layers>
-            Matrix backpropagate(NeuralNetwork<Matrix, Layers...>& network, const Matrix& input, const Matrix& expectedOutput, float learningRate = 0.001) {
+            inline Matrix backpropagate(NeuralNetwork<Matrix, Layers...>& network, const Matrix& input, const Matrix& expectedOutput, float learningRate = 0.001) {
                 return backpropagateUnpacker(learningRate, input, expectedOutput, typename sequenceGenerator<sizeof...(Layers)>::type(), network.getLayers());
             }
 
-            std::vector<Minibatch<Matrix>> loadMinibatches(const std::string& minibatchFolder) {
-                std::vector<Minibatch<Matrix>> trainingData;
+            const std::vector<Minibatch<Matrix>>& loadMinibatches(const std::string& minibatchFolder) {
                 // Load all minibatches from the folder.
                 DIR* dir = opendir(minibatchFolder.c_str());
                 for (dirent* d = readdir(dir); d != NULL; d = readdir(dir)) {
@@ -34,28 +33,45 @@ namespace ai {
                 return trainingData;
             }
 
+            // Train on a single minibatch.
+            template <int traningIters = 1, typename... Layers>
+            inline void trainMinibatch(NeuralNetwork<Matrix, Layers...>& network, const Minibatch<Matrix>& minibatch, float learningRate = 0.001) {
+                for (int i = traningIters; i > 0; --i) {
+                    backpropagate(network, minibatch.getData(), minibatch.getLabels(), learningRate);
+                }
+            }
+
+            // Train over several minibatches for a single epoch.
+            template <typename... Layers>
+            inline void trainEpoch(NeuralNetwork<Matrix, Layers...>& network, const std::vector<Minibatch<Matrix>>& trainingBatches, float learningRate = 0.001) {
+                // Loop over all minibatches.
+                for (int j = 0; j < trainingBatches.size(); ++j) {
+                    trainMinibatch(network, trainingBatches[j], learningRate);
+                }
+            }
+
+            template <typename... Layers>
+            inline void trainEpoch(NeuralNetwork<Matrix, Layers...>& network, float learningRate = 0.001) {
+                trainEpoch(network, trainingData, learningRate);
+            }
+
+            // Train for multiple epochs.
             template <int numEpochs = 1, typename... Layers>
-            void train(NeuralNetwork<Matrix, Layers...>& network, const std::vector<Minibatch<Matrix>>& trainingBatches, float learningRate = 0.001) {
+            inline void train(NeuralNetwork<Matrix, Layers...>& network, const std::vector<Minibatch<Matrix>>& trainingBatches, float learningRate = 0.001) {
                 for (int i = 0; i < numEpochs; ++i) {
-                    // Loop over all minibatches.
-                    for (int j = 0; j < trainingBatches.size(); ++j) {
-                        trainMinibatch(network, trainingBatches[j], learningRate);
-                    }
+                    trainEpoch(network, trainingBatches, learningRate);
                     std::cout << "Finished Epoch " << i << '\n';
                 }
             }
 
             template <int numEpochs = 1, typename... Layers>
-            void train(NeuralNetwork<Matrix, Layers...>& network, const std::string& minibatchFolder, float learningRate = 0.001) {
-                std::vector<Minibatch<Matrix>> trainingData = loadMinibatches(minibatchFolder);
+            inline void train(NeuralNetwork<Matrix, Layers...>& network, float learningRate = 0.001) {
                 train<numEpochs>(network, trainingData, learningRate);
             }
 
-            template <int traningIters = 1, typename... Layers>
-            void trainMinibatch(NeuralNetwork<Matrix, Layers...>& network, const Minibatch<Matrix>& minibatch, float learningRate = 0.001) {
-                for (int i = traningIters; i > 0; --i) {
-                    backpropagate(network, minibatch.getData(), minibatch.getLabels(), learningRate);
-                }
+            template <int numEpochs = 1, typename... Layers>
+            inline void train(NeuralNetwork<Matrix, Layers...>& network, const std::string& minibatchFolder, float learningRate = 0.001) {
+                train<numEpochs>(network, loadMinibatches(minibatchFolder), learningRate);
             }
         private:
             // Backpropagation unpacker.
@@ -95,6 +111,8 @@ namespace ai {
                 frontLayer.sgd(input, deltas, learningRate);
                 return previousIntermediateDeltas;
             }
+
+            std::vector<Minibatch<Matrix>> trainingData;
     };
 }
 

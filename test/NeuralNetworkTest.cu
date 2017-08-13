@@ -4,7 +4,6 @@
 #include "NeuralNetworkOptimizer.hpp"
 #include "NeuralNetworkSaver.hpp"
 #include "Minibatch.hpp"
-
 // Define layers using a custom matrix class.
 typedef LinearFCL<Matrix_F> LinearFCL_F;
 typedef SigmoidFCL<Matrix_F> SigmoidFCL_F;
