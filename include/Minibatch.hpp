@@ -21,7 +21,7 @@ namespace ai {
             }
 
             // File I/O
-            void save(const std::string& filePath) {
+            void save(const std::string& filePath) const {
                 std::ofstream saveFile(filePath);
                 if (saveFile.is_open()) {
                     save(saveFile);
@@ -30,7 +30,7 @@ namespace ai {
                 }
             }
 
-            void save(std::ofstream& saveFile) {
+            void save(std::ofstream& saveFile) const {
                 data.save(saveFile);
                 labels.save(saveFile);
             }
