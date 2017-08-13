@@ -3,14 +3,11 @@
 #include "NeuralNetwork.hpp"
 #include "NeuralNetworkOptimizer.hpp"
 #include "NeuralNetworkSaver.hpp"
-#include "Minibatch.hpp"
 // Define layers using a custom matrix class.
 typedef LinearFCL<Matrix_F> LinearFCL_F;
 typedef SigmoidFCL<Matrix_F> SigmoidFCL_F;
 typedef ReLUFCL<Matrix_F> ReLUFCL_F;
 typedef LeakyReLUFCL<Matrix_F> LeakyReLUFCL_F;
-// Define a minibatch using custom matrix class.
-typedef ai::Minibatch<Matrix_F> Minibatch_F;
 // Define a network using a custom matrix class.
 template <typename... Layers>
 using NeuralNetwork_F = ai::NeuralNetwork<Matrix_F, Layers...>;
@@ -20,7 +17,9 @@ int main() {
     Matrix_F input({10, 0}, 2);
     Matrix_F expectedOutput = input.applyFunction<ai::sigmoid>();
 
-    Minibatch_F trainingData(input, expectedOutput);
+    ai::DataSet<Matrix_F> trainingInputs, trainingExpectedOutputs;
+    trainingInputs.push_back(input);
+    trainingExpectedOutputs.push_back(expectedOutput);
 
 
     SigmoidFCL_F inputLayer(1, 50);
@@ -31,16 +30,17 @@ int main() {
 
     ai::NeuralNetworkOptimizer<Matrix_F, ai::mse<Matrix_F>, ai::mse_prime<Matrix_F>> optimizer;
     layerTest.feedForward(input).display("Testing Layer Manager feedForward");
-    optimizer.getAverageCost(layerTest, trainingData).display("Initial average cost");
+    optimizer.getAverageCost(layerTest, input, expectedOutput).display("Initial average cost");
 
     // Let's create an optimizer!
     expectedOutput.display("Testing Layer Manager training\nExpected Output");
     // Train for 1 iteration.
-    optimizer.trainMinibatch(layerTest, trainingData, 0.01);
+    optimizer.trainMinibatch(layerTest, input, expectedOutput, 0.01);
     // Train for 1000 epochs.
-    optimizer.trainMinibatch<1000>(layerTest, trainingData, 0.01);
+    optimizer.train<1000>(layerTest, trainingInputs, trainingExpectedOutputs, 0.01);
+    // optimizer.trainMinibatch<1000>(layerTest, input, expectedOutput, 0.01);
     layerTest.feedForward(input).display("Actual");
-    optimizer.getAverageCost(layerTest, trainingData).display("Final average cost");
+    optimizer.getAverageCost(layerTest, input, expectedOutput).display("Final average cost");
 
     // Let's do weight saving using a saver!
     ai::NeuralNetworkSaver saver;

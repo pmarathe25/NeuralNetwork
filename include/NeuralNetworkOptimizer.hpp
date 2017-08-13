@@ -1,11 +1,15 @@
 #ifndef NEURAL_NETWORK_OPTIMIZER_H
 #define NEURAL_NETWORK_OPTIMIZER_H
 #include "NeuralNetwork.hpp"
-#include "Minibatch.hpp"
 #include <iostream>
 #include <tuple>
+#include <vector>
 
 namespace ai {
+    // Shorthand for vector of vectors
+    template <typename Matrix>
+    using DataSet = std::vector<Matrix>;
+
     template <typename Matrix>
     inline Matrix mse(const Matrix& networkOutput, const Matrix& expectedOutput) {
         return (expectedOutput - networkOutput).pow(2) / 2;
@@ -22,55 +26,55 @@ namespace ai {
             NeuralNetworkOptimizer() { }
 
             template <int trainingIterations = 1, typename... Layers>
-            inline void trainMinibatch(NeuralNetwork<Matrix, Layers...>& network, const Minibatch<Matrix>& minibatch, float learningRate = 0.001) {
+            inline void trainMinibatch(NeuralNetwork<Matrix, Layers...>& network, const Matrix& trainingInput, const Matrix& trainingExpectedOutput, float learningRate = 0.001) {
                 for (int i = 0; i < trainingIterations; ++i) {
-                    backpropagateUnpacker(learningRate, minibatch.getData(), minibatch.getExpectedOutput(), typename sequenceGenerator<sizeof...(Layers)>::type(), network.getLayers());
+                    backpropagateUnpacker(learningRate, trainingInput, trainingExpectedOutput, typename sequenceGenerator<sizeof...(Layers)>::type(), network.getLayers());
                 }
             }
 
             // Train over several minibatches for a single epoch.
             template <typename... Layers>
-            inline void trainEpoch(NeuralNetwork<Matrix, Layers...>& network, const std::vector<Minibatch<Matrix>>& trainingSet, float learningRate = 0.001) {
+            inline void trainEpoch(NeuralNetwork<Matrix, Layers...>& network, const DataSet<Matrix>& trainingInputs, const DataSet<Matrix>& trainingExpectedOutputs, float learningRate = 0.001) {
                 // Loop over all minibatches.
-                for (int j = 0; j < trainingSet.size(); ++j) {
-                    trainMinibatch(network, trainingSet[j], learningRate);
+                for (int i = 0; i < trainingInputs.size(); ++i) {
+                    trainMinibatch(network, trainingInputs[i], trainingExpectedOutputs[i], learningRate);
                 }
             }
 
             // Train for multiple epochs.
             template <int numEpochs = 1, typename... Layers>
-            inline void train(NeuralNetwork<Matrix, Layers...>& network, const std::vector<Minibatch<Matrix>>& trainingSet, float learningRate = 0.001) {
+            inline void train(NeuralNetwork<Matrix, Layers...>& network, const DataSet<Matrix>& trainingInputs, const DataSet<Matrix>& trainingExpectedOutputs, float learningRate = 0.001) {
                 for (int i = 0; i < numEpochs; ++i) {
-                    trainEpoch(network, trainingSet, learningRate);
+                    trainEpoch(network, trainingInputs, trainingExpectedOutputs, learningRate);
                     std::cout << "Finished Epoch " << i << '\n';
                 }
             }
 
             template <int numEpochs = 1, typename... Layers>
-            inline void trainWithValidation(NeuralNetwork<Matrix, Layers...>& network, const std::vector<Minibatch<Matrix>>& trainingSet,
-                const std::vector<Minibatch<Matrix>>& validationSet, float learningRate = 0.001) {
+            inline void trainWithValidation(NeuralNetwork<Matrix, Layers...>& network, const DataSet<Matrix>& trainingInputs, const DataSet<Matrix>& trainingExpectedOutputs,
+                const DataSet<Matrix>& validationInputs, const DataSet<Matrix>& validationExpectedOutputs, float learningRate = 0.001) {
                 for (int i = 0; i < numEpochs; ++i) {
-                    trainEpoch(network, trainingSet, learningRate);
+                    trainEpoch(network, trainingInputs, trainingExpectedOutputs, learningRate);
                     std::cout << "Finished Epoch " << i << '\n';
-                    getAverageCost(network, validationSet);
+                    getAverageCost(network, validationInputs, validationExpectedOutputs);
                 }
             }
 
             template <typename... Layers>
-            Matrix getAverageCost(NeuralNetwork<Matrix, Layers...>& network, const Minibatch<Matrix>& validationMinibatch) {
+            Matrix getAverageCost(NeuralNetwork<Matrix, Layers...>& network, const Matrix& input, const Matrix& expectedOutput) {
                 // Get the actual output and then compare with expected output.
-                Matrix output = network.feedForward(validationMinibatch.getData());
-                return cost(output, validationMinibatch.getExpectedOutput()).rowMean();
+                Matrix output = network.feedForward(input);
+                return cost(output, expectedOutput).rowMean();
             }
 
             template <typename... Layers>
-            Matrix getAverageCost(NeuralNetwork<Matrix, Layers...>& network, const std::vector<Minibatch<Matrix>>& validationSet) {
-                Matrix averageCost = Matrix::zeros(1, validationSet[0].getExpectedOutput().numColumns());
-                for (int i = 0; i < validationSet.size(); ++i) {
+            Matrix getAverageCost(NeuralNetwork<Matrix, Layers...>& network, const DataSet<Matrix>& validationInputs, const DataSet<Matrix>& validationExpectedOutputs) {
+                Matrix averageCost = Matrix::zeros(1, validationExpectedOutputs[0].numColumns());
+                for (int i = 0; i < validationInputs.size(); ++i) {
                     // Average of each minibatch.
-                    averageCost += getAverageCost(network, validationSet[i]);
+                    averageCost += getAverageCost(network, validationInputs[i], validationExpectedOutputs[i]);
                 }
-                return averageCost / validationSet.size();
+                return averageCost / validationInputs.size();
             }
 
         private:
