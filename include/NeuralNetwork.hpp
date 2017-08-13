@@ -1,6 +1,7 @@
 #ifndef NEURAL_NETWORK_H
 #define NEURAL_NETWORK_H
 #include <tuple>
+#include <string>
 
 namespace ai {
     // Taken from https://stackoverflow.com/questions/7858817/unpacking-a-tuple-to-call-a-matching-function-pointer?rq=1
@@ -21,7 +22,7 @@ namespace ai {
     template <typename Matrix, typename... Layers>
     class NeuralNetwork {
         public:
-            NeuralNetwork(Layers&... layers) : layers(layers...) { }
+            NeuralNetwork(const std::string& name, Layers&... layers) : layers(layers...), name(name) { }
 
             Matrix feedForward(const Matrix& input) {
                 return getLayerOutput<sizeof...(Layers)>(input);
@@ -34,6 +35,10 @@ namespace ai {
 
             int getDepth() {
                 return sizeof...(Layers);
+            }
+
+            const std::string& getName() const {
+                return name;
             }
 
             // Return a tuple of const references to layers.
@@ -66,6 +71,7 @@ namespace ai {
             }
 
             std::tuple<Layers&...> layers;
+            const std::string name;
     };
 }
 
