@@ -53,7 +53,7 @@ namespace StealthAI {
         // Train!
         void sgd(const Matrix& input, const Matrix& deltas, float learningRate) {
             weights -= input.transpose() * deltas * learningRate;
-            biases -= deltas.weightedRowSum() * learningRate;
+            biases -= deltas.weightedSum(1) * learningRate;
         }
 
         const Matrix& getWeights() const {
