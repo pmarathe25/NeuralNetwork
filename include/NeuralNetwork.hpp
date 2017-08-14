@@ -3,7 +3,7 @@
 #include <tuple>
 #include <string>
 
-namespace ai {
+namespace StealthAI {
     // Taken from https://stackoverflow.com/questions/7858817/unpacking-a-tuple-to-call-a-matching-function-pointer?rq=1
     template<int...>
     struct sequence {};

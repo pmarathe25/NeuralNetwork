@@ -2,7 +2,7 @@
 #define FULLY_CONNECTED_LAYER_H
 #include "Layer/Layer.hpp"
 
-namespace ai {
+namespace StealthAI {
     template <typename Matrix, float activationFunc(float), float activationDerivative(float)>
     class FullyConnectedLayer : Layer<Matrix> {
     public:
@@ -73,16 +73,16 @@ namespace ai {
             biases = Matrix::randomNormalLike(biases, 0, weightRange);
         }
     };
-} /* namespace ai */
+    // Define some common layers.
+    template <typename Matrix>
+    using LinearFCL = FullyConnectedLayer<Matrix, linear, linear_prime>;
+    template <typename Matrix>
+    using SigmoidFCL = FullyConnectedLayer<Matrix, sigmoid, sigmoid_prime>;
+    template <typename Matrix>
+    using ReLUFCL = FullyConnectedLayer<Matrix, relu, relu_prime>;
+    template <typename Matrix>
+    using LeakyReLUFCL = FullyConnectedLayer<Matrix, leakyRelu, leakyRelu_prime>;
+} /* namespace StealthAI */
 
-// Define some common layers.
-template <typename Matrix>
-using LinearFCL = ai::FullyConnectedLayer<Matrix, ai::linear, ai::linear_prime>;
-template <typename Matrix>
-using SigmoidFCL = ai::FullyConnectedLayer<Matrix, ai::sigmoid, ai::sigmoid_prime>;
-template <typename Matrix>
-using ReLUFCL = ai::FullyConnectedLayer<Matrix, ai::relu, ai::relu_prime>;
-template <typename Matrix>
-using LeakyReLUFCL = ai::FullyConnectedLayer<Matrix, ai::leakyRelu, ai::leakyRelu_prime>;
 
 #endif

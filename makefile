@@ -1,9 +1,9 @@
 BUILDDIR = build/
 BINDIR = bin/
-LIBMATRIX = ~/C++/Math/lib/libmatrix.so
+LIBSTEALTHMAT = ~/C++/Math/lib/libstealthmat.so
 # LIBNEURALNETWORK = lib/libneuralnetwork.so
 LIBMATHINCLUDEPATH = /home/pranav/C++/Math/include/
-LIBS = $(LIBMATRIX) $(LIBNEURALNETWORK)
+LIBS = $(LIBSTEALTHMAT) $(LIBNEURALNETWORK)
 INCLUDEDIR = -Iinclude/ -I$(LIBMATHINCLUDEPATH)
 # OBJS = $(addprefix $(BUILDDIR)/, )
 TESTOBJS = $(addprefix $(BUILDDIR)/, NeuralNetworkTest.o)

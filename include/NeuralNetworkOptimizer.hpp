@@ -5,7 +5,7 @@
 #include <tuple>
 #include <vector>
 
-namespace ai {
+namespace StealthAI {
     // Shorthand for vector of vectors
     template <typename Matrix>
     using DataSet = std::vector<Matrix>;

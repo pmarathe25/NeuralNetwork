@@ -2,7 +2,7 @@
 #define LAYER_H
 #include <fstream>
 
-namespace ai {
+namespace StealthAI {
     template <typename T>
     __device__ T linear(T in) {
         return in;
@@ -65,6 +65,6 @@ namespace ai {
         virtual Matrix computeDeltas(const Matrix& intermediateDeltas, const Matrix& weightedOutput) const = 0;
         virtual Matrix backpropagate(const Matrix& deltas) = 0;
     };
-} /* namespace ai */
+} /* namespace StealthAI */
 
 #endif

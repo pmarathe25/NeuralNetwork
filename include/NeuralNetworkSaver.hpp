@@ -6,7 +6,7 @@
 #include <string>
 #include <fstream>
 
-namespace ai {
+namespace StealthAI {
     class NeuralNetworkSaver {
         public:
             NeuralNetworkSaver() { }
@@ -91,6 +91,6 @@ namespace ai {
             }
 
     };
-} /* namespace ai */
+} /* namespace StealthAI */
 
 #endif
