@@ -3,7 +3,7 @@
 #include "Layer/Layer.hpp"
 
 namespace ai {
-    template <typename Matrix, float (activationFunc)(float), float (*activationDeriv)(float)>
+    template <typename Matrix, float activationFunc(float), float activationDerivative(float)>
     class FullyConnectedLayer : Layer<Matrix> {
     public:
         FullyConnectedLayer() { }
@@ -43,7 +43,7 @@ namespace ai {
 
         Matrix computeDeltas(const Matrix& intermediateDeltas, const Matrix& weightedOutput) const {
             // Compute this layer's deltas
-            return intermediateDeltas.hadamard(weightedOutput.template applyFunction<activationDeriv>());
+            return intermediateDeltas.hadamard(weightedOutput.template applyFunction<activationDerivative>());
         }
 
         Matrix backpropagate(const Matrix& deltas) {

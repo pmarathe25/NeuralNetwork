@@ -20,7 +20,7 @@ namespace ai {
         return networkOutput - expectedOutput;
     }
 
-    template <typename Matrix, Matrix cost(const Matrix&, const Matrix&), Matrix costDeriv(const Matrix&, const Matrix&)>
+    template <typename Matrix, Matrix cost(const Matrix&, const Matrix&), Matrix costDerivative(const Matrix&, const Matrix&)>
     class NeuralNetworkOptimizer {
         public:
             NeuralNetworkOptimizer() { }
@@ -52,12 +52,12 @@ namespace ai {
 
             // TODO: Uhh... something better than this I guess.
             template <int numEpochs = 1, typename... Layers>
-            inline void trainWithValidation(NeuralNetwork<Matrix, Layers...>& network, const DataSet<Matrix>& trainingInputs, const DataSet<Matrix>& trainingExpectedOutputs,
+            inline void train(NeuralNetwork<Matrix, Layers...>& network, const DataSet<Matrix>& trainingInputs, const DataSet<Matrix>& trainingExpectedOutputs,
                 const DataSet<Matrix>& validationInputs, const DataSet<Matrix>& validationExpectedOutputs, float learningRate = 0.001) {
                 for (int i = 0; i < numEpochs; ++i) {
                     trainEpoch(network, trainingInputs, trainingExpectedOutputs, learningRate);
                     std::cout << "Finished Epoch " << i << '\n';
-                    getAverageCost(network, validationInputs, validationExpectedOutputs);
+                    getAverageCost(network, validationInputs, validationExpectedOutputs).display("Average Cost");
                 }
             }
 
@@ -91,7 +91,7 @@ namespace ai {
                 Matrix layerWeightedOutput = backLayer.getWeightedOutput(input);
                 Matrix layerActivationOutput = backLayer.activate(layerWeightedOutput);
                 // Compute cost derivative.
-                Matrix intermediateDeltas = costDeriv(layerActivationOutput, expectedOutput);
+                Matrix intermediateDeltas = costDerivative(layerActivationOutput, expectedOutput);
                 // Now compute deltas
                 Matrix deltas = backLayer.computeDeltas(intermediateDeltas, layerWeightedOutput);
                 // This will return intermediate deltas for the layer before this one.

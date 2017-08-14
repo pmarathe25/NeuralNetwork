@@ -13,8 +13,7 @@ template <typename... Layers>
 using NeuralNetwork_F = ai::NeuralNetwork<Matrix_F, Layers...>;
 
 int main() {
-    // Matrix_F input({100, 10, 7.5, 5, 2.5, 0, -2.5, -7.5, -10, -100}, 10);
-    Matrix_F input({10, 0}, 2);
+    Matrix_F input({100, 10, 7.5, 5, 2.5, 0, -2.5, -7.5, -10, -100}, 10);
     Matrix_F expectedOutput = input.applyFunction<ai::sigmoid>();
 
     ai::DataSet<Matrix_F> trainingInputs, trainingExpectedOutputs;
@@ -37,7 +36,7 @@ int main() {
     // Train for 1 iteration.
     optimizer.trainMinibatch(layerTest, input, expectedOutput, 0.01);
     // Train for 1000 epochs.
-    optimizer.train<1000>(layerTest, trainingInputs, trainingExpectedOutputs, 0.01);
+    optimizer.train<20>(layerTest, trainingInputs, trainingExpectedOutputs, trainingInputs, trainingExpectedOutputs, 0.01);
     // optimizer.trainMinibatch<1000>(layerTest, input, expectedOutput, 0.01);
     layerTest.feedForward(input).display("Actual");
     optimizer.getAverageCost(layerTest, input, expectedOutput).display("Final average cost");
