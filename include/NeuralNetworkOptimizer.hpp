@@ -6,10 +6,6 @@
 #include <vector>
 
 namespace StealthAI {
-    // Shorthand for vector of vectors
-    template <typename Matrix>
-    using DataSet = std::vector<Matrix>;
-
     template <typename Matrix>
     inline Matrix mse(const Matrix& networkOutput, const Matrix& expectedOutput) {
         return (expectedOutput - networkOutput).pow(2) / 2;
